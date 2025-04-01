@@ -8,6 +8,7 @@ import java.util.List;
 public interface UserService {
     void registerUser(UserRegisterDTO userRegisterDTO);
     UserProfileDTO getUserProfile(String username);
+    UserProfileDTO getUserById(Long id);
     void updateUserProfile(UserProfileDTO userProfileDTO);
     boolean isUsernameExists(String username);
     boolean isEmailExists(String email);

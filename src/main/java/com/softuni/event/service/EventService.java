@@ -20,6 +20,8 @@ public interface EventService {
     void updateEvent(Long id, EventCreateDTO eventCreateDTO);
     void deleteEvent(Long id);
     
+    void permanentlyDeleteEvent(Long id);
+    
     void changeEventStatus(Long id, EventStatus status);
     boolean joinEvent(Long eventId, String username);
     boolean leaveEvent(Long eventId, String username);

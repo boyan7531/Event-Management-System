@@ -23,7 +23,7 @@ public class HomeController {
 
     @GetMapping("/events")
     public String allEvents(Model model) {
-        model.addAttribute("events", eventService.getEventsByStatus(EventStatus.APPROVED));
+        model.addAttribute("events", eventService.getAllEvents());
         return "events";
     }
 

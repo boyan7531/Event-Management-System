@@ -131,12 +131,6 @@ public class EventServiceImpl implements EventService {
         eventEntity.setTicketPrice(eventCreateDTO.getTicketPrice());
         eventEntity.setAvailableTickets(eventCreateDTO.getAvailableTickets());
         
-        // Handle image upload if needed
-        // if (eventCreateDTO.getImage() != null && !eventCreateDTO.getImage().isEmpty()) {
-        //     String imageUrl = uploadImage(eventCreateDTO.getImage());
-        //     eventEntity.setImageUrl(imageUrl);
-        // }
-        
         eventEntity.setStatus(EventStatus.PENDING); // New events are pending by default
         eventEntity.setOrganizer(organizer);
         eventEntity.setLocation(location);
@@ -170,12 +164,6 @@ public class EventServiceImpl implements EventService {
         event.setLocation(location);
         event.setUpdatedAt(LocalDateTime.now());
         
-        // Handle image upload if needed
-        // if (eventCreateDTO.getImage() != null && !eventCreateDTO.getImage().isEmpty()) {
-        //     String imageUrl = uploadImage(eventCreateDTO.getImage());
-        //     event.setImageUrl(imageUrl);
-        // }
-        
         eventRepository.save(event);
     }
 
@@ -193,6 +181,22 @@ public class EventServiceImpl implements EventService {
         
         // Notify attendees about cancellation
         notificationService.notifyEventCancelled(event);
+    }
+
+    @Override
+    @Transactional
+    public void permanentlyDeleteEvent(Long id) {
+        EventEntity event = eventRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Event", "id", id));
+        
+        // First, notify attendees about deletion
+        notificationService.notifyEventCancelled(event);
+        
+        // Remove all attendees (clear the many-to-many relationship)
+        event.getAttendees().clear();
+        
+        // Delete the event
+        eventRepository.delete(event);
     }
 
     @Override

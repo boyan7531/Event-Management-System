@@ -39,9 +39,6 @@ public class EventEntity extends BaseEntity {
     @Column(name = "available_tickets")
     private Integer availableTickets;
 
-    @Column(name = "image_url")
-    private String imageUrl;
-
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private EventStatus status;

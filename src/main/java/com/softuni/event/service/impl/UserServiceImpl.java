@@ -38,6 +38,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public void registerUser(UserRegisterDTO userRegisterDTO) {
+        // Create user entity
         UserEntity userEntity = new UserEntity();
         userEntity.setUsername(userRegisterDTO.getUsername());
         userEntity.setEmail(userRegisterDTO.getEmail());
@@ -57,20 +58,22 @@ public class UserServiceImpl implements UserService {
         // Save user first
         userEntity = userRepository.save(userEntity);
         
-        // Set default role to USER
-        UserRoleEntity userRole = userRoleRepository
-                .findByRole(UserRole.USER)
+        // Find or create USER role
+        UserRoleEntity userRole = userRoleRepository.findByRole(UserRole.USER)
                 .orElseGet(() -> {
                     UserRoleEntity role = new UserRoleEntity();
                     role.setRole(UserRole.USER);
-                    return userRoleRepository.save(role);
+                    return role;
                 });
         
+        // Set up bidirectional relationship
         userRole.setUser(userEntity);
+        userEntity.getRoles().add(userRole);
+        
+        // Save role first because it has the foreign key
         userRoleRepository.save(userRole);
         
-        // Add role to user's collection
-        userEntity.getRoles().add(userRole);
+        // Save the user with updated roles
         userRepository.save(userEntity);
     }
 
@@ -78,6 +81,18 @@ public class UserServiceImpl implements UserService {
     public UserProfileDTO getUserProfile(String username) {
         UserEntity userEntity = userRepository
                 .findByUsername(username)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        
+        UserProfileDTO userProfileDTO = modelMapper.map(userEntity, UserProfileDTO.class);
+        userProfileDTO.setAdmin(hasAdminRole(userEntity));
+        
+        return userProfileDTO;
+    }
+
+    @Override
+    public UserProfileDTO getUserById(Long id) {
+        UserEntity userEntity = userRepository
+                .findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
         
         UserProfileDTO userProfileDTO = modelMapper.map(userEntity, UserProfileDTO.class);

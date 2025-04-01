@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head th:replace="fragments/layout :: head('Admin - User Management')">
+    <title>Admin - User Management</title>
+</head>
+
+<body>
+    <nav th:replace="fragments/layout :: navbar"></nav>
+
+    <div class="container my-5">
+        <div class="card shadow mb-4">
+            <div class="card-header bg-primary text-white">
+                <h2 class="mb-0">User Management</h2>
+            </div>
+            <div class="card-body">
+                <!-- Success Messages -->
+                <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="bi bi-check-circle-fill me-2"></i>
+                    <span th:text="${successMessage}">Success Message</span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                
+                <!-- Error Messages -->
+                <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                    <span th:text="${errorMessage}">Error Message</span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                
+                <!-- User Table -->
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>ID</th>
+                                <th>Username</th>
+                                <th>Email</th>
+                                <th>Full Name</th>
+                                <th>Roles</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="user : ${users}">
+                                <td th:text="${user.id}">1</td>
+                                <td th:text="${user.username}">admin</td>
+                                <td th:text="${user.email}">admin@example.com</td>
+                                <td th:text="${user.firstName + ' ' + user.lastName}">Admin User</td>
+                                <td>
+                                    <span th:if="${user.admin}" class="badge bg-danger">ADMIN</span>
+                                    <span class="badge bg-secondary">USER</span>
+                                </td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <a th:href="@{/users/admin/edit/{id}(id=${user.id})}" class="btn btn-sm btn-outline-primary">
+                                            <i class="bi bi-pencil"></i> Edit
+                                        </a>
+                                        <button th:if="${!user.admin}" class="btn btn-sm btn-outline-success" 
+                                                data-bs-toggle="modal" th:data-bs-target="${'#makeAdminModal-' + user.id}">
+                                            <i class="bi bi-shield"></i> Make Admin
+                                        </button>
+                                        <button th:if="${user.admin && user.id != 1}" class="btn btn-sm btn-outline-warning" 
+                                                data-bs-toggle="modal" th:data-bs-target="${'#removeAdminModal-' + user.id}">
+                                            <i class="bi bi-shield-x"></i> Remove Admin
+                                        </button>
+                                    </div>
+                                    
+                                    <!-- Make Admin Modal -->
+                                    <div class="modal fade" th:id="${'makeAdminModal-' + user.id}" tabindex="-1" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title">Make Admin</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <p>Are you sure you want to make <strong th:text="${user.username}"></strong> an administrator?</p>
+                                                    <p class="text-danger">This will grant them full access to the admin panel.</p>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                    <form th:action="@{/users/admin/role/{id}(id=${user.id})}" method="post">
+                                                        <input type="hidden" name="role" value="ADMIN">
+                                                        <button type="submit" class="btn btn-success">Make Admin</button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Remove Admin Modal -->
+                                    <div class="modal fade" th:id="${'removeAdminModal-' + user.id}" tabindex="-1" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title">Remove Admin</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <p>Are you sure you want to remove administrator privileges from <strong th:text="${user.username}"></strong>?</p>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                    <form th:action="@{/users/admin/role/{id}(id=${user.id})}" method="post">
+                                                        <input type="hidden" name="role" value="USER">
+                                                        <button type="submit" class="btn btn-warning">Remove Admin</button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr th:if="${users.empty}">
+                                <td colspan="6" class="text-center">No users found</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer th:replace="fragments/layout :: footer"></footer>
+    
+    <th:block th:replace="fragments/layout :: scripts"></th:block>
+</body>
+</html> 

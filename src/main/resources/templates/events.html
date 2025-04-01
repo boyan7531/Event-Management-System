@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" 
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head th:replace="~{fragments/layout :: head('Events')}">
+    <title>Events - Event Management System</title>
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+    <!-- Events Header -->
+    <section class="py-5 feature-section">
+        <div class="container">
+            <h2>Browse Events</h2>
+            <p class="text-center text-muted mb-4">Discover and join upcoming events in your community</p>
+            
+            <!-- Search Bar -->
+            <div class="row justify-content-center mb-5">
+                <div class="col-md-6">
+                    <form action="/events/search" method="GET" class="d-flex">
+                        <input type="text" name="keyword" class="form-control me-2" placeholder="Search events...">
+                        <button type="submit" class="btn btn-primary">Search</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Events List -->
+    <section class="py-5">
+        <div class="container">
+            <div class="row g-4">
+                <!-- Display events if available -->
+                <div th:if="${!events.empty}" th:each="event : ${events}" class="col-md-4 mb-4">
+                    <div class="card h-100">
+                        <div class="card-header bg-primary">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="badge bg-light text-dark">
+                                    <i class="bi bi-calendar me-1"></i>
+                                    <span th:text="${#temporals.format(event.eventDate, 'MMM dd, yyyy')}">Date</span>
+                                </span>
+                                <span class="badge" th:classappend="${
+                                    event.status.name() == 'APPROVED' ? 'bg-success' : 
+                                    event.status.name() == 'PENDING' ? 'bg-warning' : 
+                                    event.status.name() == 'REJECTED' ? 'bg-danger' : 
+                                    event.status.name() == 'CANCELED' ? 'bg-danger' : 'bg-secondary'
+                                }">
+                                    <span th:text="${event.status}">Status</span>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title" th:text="${event.title}">Event Title</h5>
+                            <p class="card-text" th:text="${#strings.abbreviate(event.description, 100)}">Description</p>
+                            <div class="mt-auto d-flex justify-content-between align-items-center">
+                                <span class="text-muted">
+                                    <i class="bi bi-people-fill me-1"></i>
+                                    <span th:text="${event.attendees.size()}">0</span> attendees
+                                </span>
+                                <a th:href="@{/events/details/{id}(id=${event.id})}" class="btn btn-outline-primary">Details</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- If no events are available -->
+                <div th:if="${events.empty}" class="col-12 text-center py-5">
+                    <div class="py-5">
+                        <i class="bi bi-calendar-x text-muted" style="font-size: 3.5rem;"></i>
+                        <h3 class="mt-3">No events found</h3>
+                        <p class="text-muted">There are no upcoming events at this time.</p>
+                        <div class="mt-4">
+                            <a href="/" class="btn btn-outline-primary me-2">Return Home</a>
+                            <a href="/events/create" sec:authorize="isAuthenticated()" class="btn btn-primary">Create Event</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Create Event CTA -->
+    <section class="py-5 cta-section text-center text-white" sec:authorize="isAuthenticated()">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <h2>Have an event in mind?</h2>
+                    <p class="lead mb-4">Share your event with the community and connect with interested attendees.</p>
+                    <a href="/events/create" class="btn btn-light btn-lg">Create Your Event</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer th:replace="~{fragments/layout :: footer}"></footer>
+    
+    <!-- Scripts -->
+    <th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html> 

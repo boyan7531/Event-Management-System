@@ -38,6 +38,11 @@ public class UserRegisterDTO {
     @Size(min = 2, max = 50, message = "Last Name must be between 2 and 50 characters")
     private String lastName;
 
-    @Pattern(regexp = "^\\+?[0-9 ()-]{10,15}$", message = "Phone number must be valid")
+    @Pattern(regexp = "^(0[\\d]{9}|\\+?[0-9 ()-]{10,15})$", message = "Phone number must be valid")
     private String phone;
+    
+    // Custom method to check if passwords match
+    public boolean passwordsMatch() {
+        return password != null && password.equals(confirmPassword);
+    }
 } 

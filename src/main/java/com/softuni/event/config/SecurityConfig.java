@@ -22,8 +22,8 @@ public class SecurityConfig {
                 .requestMatchers("/users/register", "/users/login").permitAll()
                 .requestMatchers("/events/details/**").permitAll()
                 .requestMatchers("/api/**").permitAll()
-                .requestMatchers("/users/admin/**").hasRole("ADMIN")
-                .requestMatchers("/events/create").hasRole("ORGANIZER")
+                .requestMatchers("/admin", "/users/admin/**").hasRole("ADMIN")
+                .requestMatchers("/events/create").authenticated()
                 .anyRequest().authenticated()
             )
             .formLogin(formLogin -> formLogin
@@ -39,7 +39,8 @@ public class SecurityConfig {
             )
             .securityContext(securityContext -> securityContext
                 .securityContextRepository(securityContextRepository())
-            );
+            )
+            .csrf(csrf -> csrf.disable());
 
         return http.build();
     }

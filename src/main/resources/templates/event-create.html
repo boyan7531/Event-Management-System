@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" 
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head th:replace="fragments/layout :: head('Create Event')">
+    <title>Create Event - Event Management System</title>
+</head>
+
+<body>
+    <nav th:replace="fragments/layout :: navbar"></nav>
+
+    <div class="container my-5">
+        <div class="row">
+            <div class="col-md-8 offset-md-2">
+                <div class="card shadow">
+                    <div class="card-header bg-primary text-white">
+                        <h3 class="mb-0">Create New Event</h3>
+                    </div>
+                    <div class="card-body">
+                        <!-- Error message -->
+                        <div th:if="${errorMessage}" class="alert alert-danger mb-4" role="alert">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                            <span th:text="${errorMessage}">Error message</span>
+                        </div>
+                        
+                        <form th:action="@{/events/create}" th:object="${eventForm}" method="post">
+                            
+                            <!-- Title -->
+                            <div class="mb-3">
+                                <label for="title" class="form-label">Event Title</label>
+                                <input type="text" class="form-control" id="title" th:field="*{title}" required>
+                                <div class="text-danger" th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></div>
+                            </div>
+                            
+                            <!-- Description -->
+                            <div class="mb-3">
+                                <label for="description" class="form-label">Event Description</label>
+                                <textarea class="form-control" id="description" th:field="*{description}" rows="5" required></textarea>
+                                <div class="text-danger" th:if="${#fields.hasErrors('description')}" th:errors="*{description}"></div>
+                            </div>
+                            
+                            <!-- Event Date -->
+                            <div class="mb-3">
+                                <label for="eventDate" class="form-label">Event Date and Time</label>
+                                <input type="datetime-local" class="form-control" id="eventDate" th:field="*{eventDate}" required>
+                                <div class="text-danger" th:if="${#fields.hasErrors('eventDate')}" th:errors="*{eventDate}"></div>
+                            </div>
+                            
+                            <!-- Registration Deadline -->
+                            <div class="mb-3">
+                                <label for="registrationDeadline" class="form-label">Registration Deadline</label>
+                                <input type="datetime-local" class="form-control" id="registrationDeadline" th:field="*{registrationDeadline}">
+                                <div class="text-danger" th:if="${#fields.hasErrors('registrationDeadline')}" th:errors="*{registrationDeadline}"></div>
+                            </div>
+                            
+                            <!-- Is Paid Event -->
+                            <div class="mb-3 form-check">
+                                <input type="checkbox" class="form-check-input" id="paid" th:field="*{paid}">
+                                <label class="form-check-label" for="paid">This is a paid event</label>
+                            </div>
+                            
+                            <!-- Ticket Price -->
+                            <div class="mb-3" id="ticketPriceDiv">
+                                <label for="ticketPrice" class="form-label">Ticket Price</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">$</span>
+                                    <input type="number" class="form-control" id="ticketPrice" th:field="*{ticketPrice}" step="0.01" min="0">
+                                </div>
+                                <div class="text-danger" th:if="${#fields.hasErrors('ticketPrice')}" th:errors="*{ticketPrice}"></div>
+                            </div>
+                            
+                            <!-- Available Tickets -->
+                            <div class="mb-3">
+                                <label for="availableTickets" class="form-label">Available Tickets</label>
+                                <input type="number" class="form-control" id="availableTickets" th:field="*{availableTickets}" min="1" required>
+                                <div class="text-danger" th:if="${#fields.hasErrors('availableTickets')}" th:errors="*{availableTickets}"></div>
+                            </div>
+                            
+                            <!-- Location -->
+                            <div class="mb-3">
+                                <label for="locationId" class="form-label">Event Location</label>
+                                <select class="form-select" id="locationId" th:field="*{locationId}" required>
+                                    <option value="">Select a location</option>
+                                    <option th:each="location : ${locations}" 
+                                            th:value="${location.id}" 
+                                            th:text="${location.name + ' (' + location.address + ', ' + location.city + ')'}">
+                                    </option>
+                                </select>
+                                <div class="text-danger" th:if="${#fields.hasErrors('locationId')}" th:errors="*{locationId}"></div>
+                            </div>
+                            
+                            <!-- Submit Button -->
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-primary">Create Event</button>
+                                <a href="/events" class="btn btn-outline-secondary">Cancel</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer th:replace="fragments/layout :: footer"></footer>
+    
+    <th:block th:replace="fragments/layout :: scripts"></th:block>
+    
+    <script>
+        // Show/hide ticket price based on isPaid checkbox
+        $(document).ready(function() {
+            // Initial state
+            toggleTicketPrice();
+            
+            // On change
+            $('#paid').change(function() {
+                toggleTicketPrice();
+            });
+            
+            function toggleTicketPrice() {
+                if ($('#paid').is(':checked')) {
+                    $('#ticketPriceDiv').show();
+                } else {
+                    $('#ticketPriceDiv').hide();
+                    $('#ticketPrice').val('0.00');
+                }
+            }
+        });
+    </script>
+</body>
+</html> 

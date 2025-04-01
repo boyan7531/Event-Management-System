@@ -19,7 +19,6 @@ public class EventBasicDTO {
     private LocalDateTime eventDate;
     private boolean isPaid;
     private BigDecimal ticketPrice;
-    private String imageUrl;
     private EventStatus status;
     private LocationBasicDTO location;
 } 

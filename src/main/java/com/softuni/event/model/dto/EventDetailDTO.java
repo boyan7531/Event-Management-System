@@ -24,7 +24,6 @@ public class EventDetailDTO {
     private boolean isPaid;
     private BigDecimal ticketPrice;
     private Integer availableTickets;
-    private String imageUrl;
     private EventStatus status;
     private UserBasicDTO organizer;
     private LocationBasicDTO location;

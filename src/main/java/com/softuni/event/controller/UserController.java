@@ -5,12 +5,15 @@ import com.softuni.event.model.dto.UserRegisterDTO;
 import com.softuni.event.service.NotificationService;
 import com.softuni.event.service.UserService;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 
 @Controller
@@ -38,6 +41,12 @@ public class UserController {
         if (bindingResult.hasErrors()) {
             return "register";
         }
+        
+        // Check if passwords match
+        if (!userRegisterDTO.passwordsMatch()) {
+            bindingResult.rejectValue("confirmPassword", "error.user", "Passwords do not match");
+            return "register";
+        }
 
         // Check if username already exists
         if (userService.isUsernameExists(userRegisterDTO.getUsername())) {
@@ -53,7 +62,7 @@ public class UserController {
 
         // Register user
         userService.registerUser(userRegisterDTO);
-        return "redirect:/users/login";
+        return "redirect:/users/login?registered=true";
     }
 
     @GetMapping("/login")
@@ -98,5 +107,50 @@ public class UserController {
     public String changeUserRole(@PathVariable Long id, @RequestParam String role) {
         userService.changeUserRole(id, role);
         return "redirect:/users/admin/users";
+    }
+
+    @GetMapping("/logout")
+    public String logout(HttpServletRequest request) {
+        // Perform logout
+        SecurityContextHolder.clearContext();
+        HttpSession session = request.getSession(false);
+        if (session != null) {
+            session.invalidate();
+        }
+        
+        // Redirect to home page
+        return "redirect:/";
+    }
+
+    @GetMapping("/admin/edit/{id}")
+    public String adminEditUserForm(@PathVariable Long id, Model model) {
+        try {
+            UserProfileDTO userProfileDTO = userService.getUserById(id);
+            model.addAttribute("userForm", userProfileDTO);
+            return "admin-edit-user";
+        } catch (Exception e) {
+            return "redirect:/users/admin/users?error=User+not+found";
+        }
+    }
+    
+    @PostMapping("/admin/edit/{id}")
+    public String adminUpdateUser(@PathVariable Long id, 
+                                @Valid @ModelAttribute("userForm") UserProfileDTO userProfileDTO,
+                                BindingResult bindingResult,
+                                Model model) {
+        // Set the ID to ensure we update the correct user
+        userProfileDTO.setId(id);
+        
+        if (bindingResult.hasErrors()) {
+            return "admin-edit-user";
+        }
+        
+        try {
+            userService.updateUserProfile(userProfileDTO);
+            return "redirect:/users/admin/users?success=User+updated+successfully";
+        } catch (Exception e) {
+            model.addAttribute("errorMessage", "Error updating user: " + e.getMessage());
+            return "admin-edit-user";
+        }
     }
 }

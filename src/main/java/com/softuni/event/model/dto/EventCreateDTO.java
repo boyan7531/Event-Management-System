@@ -34,15 +34,13 @@ public class EventCreateDTO {
     @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm")
     private LocalDateTime registrationDeadline;
 
-    private boolean isPaid;
+    private boolean paid;
 
     @DecimalMin(value = "0.0", message = "Ticket price must be a positive number")
     private BigDecimal ticketPrice;
 
     @Min(value = 1, message = "Available tickets must be at least 1")
     private Integer availableTickets;
-
-    private MultipartFile image;
 
     @NotNull(message = "Location is required")
     private Long locationId;
