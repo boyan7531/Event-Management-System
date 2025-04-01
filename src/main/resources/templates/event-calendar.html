@@ -32,8 +32,8 @@
                 <!-- Calendar Grid -->
                 <div class="table-responsive">
                     <table class="table table-bordered">
-                        <thead class="table-light">
-                            <tr>
+                        <thead>
+                            <tr class="bg-dark text-white">
                                 <th class="text-center">Monday</th>
                                 <th class="text-center">Tuesday</th>
                                 <th class="text-center">Wednesday</th>
@@ -49,7 +49,6 @@
                                 <!-- Days in Week -->
                                 <td th:each="dayOfWeek : ${#numbers.sequence(1, 7)}" 
                                     th:with="dayNumber = ${week * 7 + dayOfWeek - firstDayOfMonth + 1}"
-                                    th:class="${dayNumber > 0 && dayNumber <= daysInMonth ? '' : 'bg-light'}" 
                                     style="height: 120px; width: 14.28%; vertical-align: top;">
                                     
                                     <!-- Day Number -->
@@ -73,9 +72,9 @@
                                         <div th:each="event : ${eventsByDay.get(dayNumber)}" class="mb-1">
                                             <a th:href="@{/events/details/{id}(id=${event.id})}" 
                                                class="text-decoration-none">
-                                                <div class="card card-body p-2 bg-light">
+                                                <div class="card card-body p-2 bg-dark text-white">
                                                     <small th:text="${event.title}">Event Title</small>
-                                                    <small class="text-muted" th:text="${#temporals.format(event.eventDate, 'HH:mm')}">10:00</small>
+                                                    <small class="text-white-50" th:text="${#temporals.format(event.eventDate, 'HH:mm')}">10:00</small>
                                                 </div>
                                             </a>
                                         </div>

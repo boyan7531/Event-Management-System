@@ -84,8 +84,12 @@ public class UserController {
     public String profile(@AuthenticationPrincipal UserDetails userDetails, Model model) {
         UserProfileDTO userProfile = userService.getUserProfile(userDetails.getUsername());
         model.addAttribute("user", userProfile);
+        
+        // Use the new notification system instead of the old one
         model.addAttribute("notifications", 
-                notificationService.getRecentNotifications(userDetails.getUsername()));
+                notificationService.getNotificationsForUser(
+                        userService.getUserByUsername(userDetails.getUsername())));
+        
         return "profile";
     }
 
