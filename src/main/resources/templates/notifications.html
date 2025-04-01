@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head('Notifications - Event Management System')}">
+    <title>Notifications - Event Management System</title>
+</head>
+<body>
+
+<!-- Navigation -->
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<!-- Notifications Section -->
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <h1 class="text-center mb-5">Your Notifications</h1>
+            
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h2 class="h5 mb-0">All Notifications</h2>
+                    <div>
+                        <button id="clearAllNotifications" class="btn btn-sm btn-outline-danger">
+                            <i class="bi bi-trash"></i> Clear All
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div th:if="${#lists.isEmpty(notifications)}" class="text-center py-5">
+                        <i class="bi bi-bell text-muted display-4"></i>
+                        <p class="lead text-muted mt-3">You have no notifications</p>
+                    </div>
+                    
+                    <ul th:unless="${#lists.isEmpty(notifications)}" class="list-group list-group-flush">
+                        <li th:each="notification : ${notifications}" class="list-group-item p-3">
+                            <div class="d-flex">
+                                <div class="flex-shrink-0 me-3">
+                                    <!-- Icon based on notification type -->
+                                    <i th:if="${notification.type.name() == 'EVENT_APPROVED'}" class="bi bi-check-circle-fill text-success fs-4"></i>
+                                    <i th:if="${notification.type.name() == 'EVENT_REJECTED'}" class="bi bi-x-circle-fill text-danger fs-4"></i>
+                                    <i th:if="${notification.type.name() == 'EVENT_CANCELED'}" class="bi bi-slash-circle-fill text-warning fs-4"></i>
+                                    <i th:if="${notification.type.name() == 'NEW_EVENT_PENDING'}" class="bi bi-hourglass-split text-primary fs-4"></i>
+                                    <i th:if="${notification.type.name() == 'NEW_MESSAGE'}" class="bi bi-envelope-fill text-info fs-4"></i>
+                                    <i th:if="${notification.type.name() == 'SYSTEM'}" class="bi bi-gear-fill text-secondary fs-4"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <div class="d-flex justify-content-between">
+                                        <p class="mb-1" th:text="${notification.message}">Notification message</p>
+                                        <small class="text-muted" th:text="${#temporals.format(notification.createdAt, 'MMM dd, yyyy HH:mm')}">Jun 12, 2023</small>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <a th:if="${notification.link != null}" th:href="${notification.link}" class="btn btn-sm btn-outline-primary mt-2">
+                                            <i class="bi bi-eye"></i> View Details
+                                        </a>
+                                        <form th:data-notification-id="${notification.id}" class="delete-notification-form d-inline">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger mt-2">
+                                                <i class="bi bi-trash"></i> Delete
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+
+<!-- Scripts -->
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+
+<script>
+    $(document).ready(function() {
+        // Handle notification deletion
+        $('.delete-notification-form').on('submit', function(e) {
+            e.preventDefault();
+            const notificationId = $(this).data('notification-id');
+            
+            $.ajax({
+                url: '/notifications/delete/' + notificationId,
+                type: 'POST',
+                success: function() {
+                    // Remove the notification from the UI
+                    $('.delete-notification-form[data-notification-id="' + notificationId + '"]').closest('li').fadeOut(300, function() {
+                        $(this).remove();
+                        
+                        // Check if there are any notifications left
+                        if ($('.list-group-item').length === 0) {
+                            $('.list-group').replaceWith(
+                                '<div class="text-center py-5">' +
+                                '<i class="bi bi-bell text-muted display-4"></i>' +
+                                '<p class="lead text-muted mt-3">You have no notifications</p>' +
+                                '</div>'
+                            );
+                        }
+                    });
+                }
+            });
+        });
+        
+        // Handle clear all notifications
+        $('#clearAllNotifications').on('click', function() {
+            if (confirm('Are you sure you want to delete all notifications?')) {
+                $('.delete-notification-form').each(function() {
+                    const notificationId = $(this).data('notification-id');
+                    
+                    $.ajax({
+                        url: '/notifications/delete/' + notificationId,
+                        type: 'POST'
+                    });
+                });
+                
+                // Remove all notifications from the UI
+                $('.list-group').fadeOut(300, function() {
+                    $(this).replaceWith(
+                        '<div class="text-center py-5">' +
+                        '<i class="bi bi-bell text-muted display-4"></i>' +
+                        '<p class="lead text-muted mt-3">You have no notifications</p>' +
+                        '</div>'
+                    );
+                });
+            }
+        });
+    });
+</script>
+
+</body>
+</html> 

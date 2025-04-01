@@ -2,9 +2,12 @@ package com.softuni.event.controller;
 
 import com.softuni.event.model.dto.EventCreateDTO;
 import com.softuni.event.model.dto.EventDetailDTO;
+import com.softuni.event.model.entity.EventEntity;
 import com.softuni.event.model.enums.EventStatus;
+import com.softuni.event.model.enums.NotificationType;
 import com.softuni.event.service.EventService;
 import com.softuni.event.service.LocationService;
+import com.softuni.event.service.NotificationService;
 import com.softuni.event.service.TicketService;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -26,11 +29,13 @@ public class EventController {
     private final EventService eventService;
     private final LocationService locationService;
     private final TicketService ticketService;
+    private final NotificationService notificationService;
 
-    public EventController(EventService eventService, LocationService locationService, TicketService ticketService) {
+    public EventController(EventService eventService, LocationService locationService, TicketService ticketService, NotificationService notificationService) {
         this.eventService = eventService;
         this.locationService = locationService;
         this.ticketService = ticketService;
+        this.notificationService = notificationService;
     }
 
     @GetMapping("/details/{id}")
@@ -69,6 +74,11 @@ public class EventController {
 
         try {
             Long eventId = eventService.createEvent(eventForm, userDetails.getUsername());
+            
+            // Create notification for admin about the new pending event
+            EventEntity event = eventService.getEvent(eventId);
+            notificationService.createPendingEventNotification(event);
+            
             return "redirect:/events/details/" + eventId;
         } catch (IllegalStateException e) {
             // Handle location availability error
@@ -106,28 +116,46 @@ public class EventController {
 
     @PostMapping("/{id}/approve")
     public String approveEvent(@PathVariable Long id, @RequestParam(required = false) String redirectUrl) {
+        EventEntity event = eventService.getEvent(id);
         eventService.changeEventStatus(id, EventStatus.APPROVED);
+        
+        // Create notification for the event creator
+        notificationService.createEventStatusNotification(event, NotificationType.EVENT_APPROVED);
+        
         if (redirectUrl != null && !redirectUrl.isEmpty()) {
             return "redirect:" + redirectUrl;
         }
+        
         return "redirect:/events/details/" + id;
     }
 
     @PostMapping("/{id}/reject")
     public String rejectEvent(@PathVariable Long id, @RequestParam(required = false) String redirectUrl) {
+        EventEntity event = eventService.getEvent(id);
         eventService.changeEventStatus(id, EventStatus.REJECTED);
+        
+        // Create notification for the event creator
+        notificationService.createEventStatusNotification(event, NotificationType.EVENT_REJECTED);
+        
         if (redirectUrl != null && !redirectUrl.isEmpty()) {
             return "redirect:" + redirectUrl;
         }
+        
         return "redirect:/events/details/" + id;
     }
 
     @PostMapping("/{id}/cancel")
     public String cancelEvent(@PathVariable Long id, @RequestParam(required = false) String redirectUrl) {
+        EventEntity event = eventService.getEvent(id);
         eventService.deleteEvent(id); // This will set status to CANCELED
+        
+        // Create notification for the event creator
+        notificationService.createEventStatusNotification(event, NotificationType.EVENT_CANCELED);
+        
         if (redirectUrl != null && !redirectUrl.isEmpty()) {
             return "redirect:" + redirectUrl;
         }
+        
         return "redirect:/events/my-events";
     }
 

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head('Terms of Service - Event Management System')}">
+    <title>Terms of Service - Event Management System</title>
+</head>
+<body>
+
+<!-- Navigation -->
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<!-- Terms of Service Section -->
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <h1 class="text-center mb-5">Terms of Service</h1>
+            <p class="lead text-center mb-5">Last Updated: July 2023</p>
+            
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h2>1. Introduction</h2>
+                    <p>Welcome to Event Hub. These Terms of Service govern your use of our website and services. By using our service, you agree to these terms. Please read them carefully.</p>
+                    <p>The Event Hub platform (referred to as "we", "us", or "our") provides event management services, enabling users to create, find, and register for events.</p>
+                </div>
+            </div>
+            
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h2>2. User Accounts</h2>
+                    <p>To use certain features of our Service, you must register for an account. You agree to provide accurate information and keep your account details secure.</p>
+                    <p>Users are responsible for all activities that occur under their account. If you discover any unauthorized use of your account, please notify us immediately.</p>
+                </div>
+            </div>
+            
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h2>3. Events</h2>
+                    <h3>3.1 Creating Events</h3>
+                    <p>Event creators are responsible for providing accurate and complete information about their events.</p>
+                    <p>Events must comply with our Community Guidelines and applicable laws. We reserve the right to remove events that violate these terms.</p>
+                    
+                    <h3>3.2 Event Registration</h3>
+                    <p>When registering for an event, users agree to provide accurate information and adhere to the event's specific terms.</p>
+                    <p>Cancellation policies may vary by event. Users should review these policies before registering.</p>
+                </div>
+            </div>
+            
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h2>4. Prohibited Activities</h2>
+                    <p>When using our service, you agree not to:</p>
+                    <ul>
+                        <li>Violate any laws or regulations</li>
+                        <li>Infringe on the rights of others</li>
+                        <li>Submit false or misleading information</li>
+                        <li>Use the service for unauthorized commercial purposes</li>
+                        <li>Attempt to gain unauthorized access to our systems</li>
+                        <li>Engage in any activity that interferes with the proper functioning of the service</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h2>5. Content and Intellectual Property</h2>
+                    <p>Users retain ownership of the content they submit. By submitting content, you grant us a non-exclusive license to use, display, and distribute that content in connection with our services.</p>
+                    <p>All intellectual property rights in the service are owned by us or our licensors.</p>
+                </div>
+            </div>
+            
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h2>6. Privacy</h2>
+                    <p>Our Privacy Policy explains how we collect, use, and protect your information. By using our service, you consent to our data practices as described in our Privacy Policy.</p>
+                </div>
+            </div>
+            
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h2>7. Limitation of Liability</h2>
+                    <p>To the maximum extent permitted by law, we shall not be liable for any indirect, incidental, special, consequential, or punitive damages resulting from your use or inability to use the service.</p>
+                </div>
+            </div>
+            
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h2>8. Changes to Terms</h2>
+                    <p>We may update these Terms from time to time. We will notify users of significant changes by posting a notice on our website or sending an email.</p>
+                    <p>Your continued use of the service after such modifications constitutes your acceptance of the updated Terms.</p>
+                </div>
+            </div>
+            
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h2>9. Termination</h2>
+                    <p>We reserve the right to suspend or terminate your account and access to our services if you violate these Terms or engage in fraudulent or illegal activities.</p>
+                </div>
+            </div>
+            
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h2>10. Contact Us</h2>
+                    <p>If you have any questions about these Terms, please contact us at:</p>
+                    <p>Email: <a href="mailto:support@eventhub.com">support@eventhub.com</a></p>
+                    <p>Phone: +1 123 456 7890</p>
+                    <p>Address: 123 Event Street, City, Country</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+
+<!-- Scripts -->
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+
+</body>
+</html> 

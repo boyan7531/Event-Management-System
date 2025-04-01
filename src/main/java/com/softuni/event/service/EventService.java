@@ -36,4 +36,7 @@ public interface EventService {
     void changeEventStatus(Long id, EventStatus status);
     boolean joinEvent(Long eventId, String username);
     boolean leaveEvent(Long eventId, String username);
+    
+    // Added method to get the event entity directly
+    com.softuni.event.model.entity.EventEntity getEvent(Long id);
 } 

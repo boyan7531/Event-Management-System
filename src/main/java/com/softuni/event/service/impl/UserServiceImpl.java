@@ -192,4 +192,20 @@ public class UserServiceImpl implements UserService {
                 .stream()
                 .anyMatch(role -> role.getRole() == UserRole.ADMIN);
     }
+    
+    @Override
+    public UserEntity getUserByUsername(String username) {
+        return userRepository
+                .findByUsername(username)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+    }
+    
+    @Override
+    public List<UserEntity> getAllAdmins() {
+        return userRepository
+                .findAll()
+                .stream()
+                .filter(this::hasAdminRole)
+                .collect(Collectors.toList());
+    }
 } 

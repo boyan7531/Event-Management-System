@@ -369,6 +369,12 @@ public class EventServiceImpl implements EventService {
         return overlappingEvents.isEmpty();
     }
     
+    @Override
+    public EventEntity getEvent(Long id) {
+        return eventRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Event", "id", id));
+    }
+    
     private EventDetailDTO mapToDetailDTO(EventEntity event) {
         EventDetailDTO dto = modelMapper.map(event, EventDetailDTO.class);
         

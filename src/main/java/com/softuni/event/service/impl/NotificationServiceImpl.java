@@ -1,10 +1,14 @@
 package com.softuni.event.service.impl;
 
 import com.softuni.event.model.entity.EventEntity;
+import com.softuni.event.model.entity.NotificationEntity;
 import com.softuni.event.model.entity.UserEntity;
 import com.softuni.event.model.enums.EventStatus;
+import com.softuni.event.model.enums.NotificationType;
 import com.softuni.event.repository.EventRepository;
+import com.softuni.event.repository.NotificationRepository;
 import com.softuni.event.service.NotificationService;
+import com.softuni.event.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -15,6 +19,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.List;
 
 @Service
 @Primary
@@ -25,10 +30,14 @@ public class NotificationServiceImpl implements NotificationService {
     private static final int MAX_NOTIFICATIONS = 20;
     
     private final EventRepository eventRepository;
+    private final NotificationRepository notificationRepository;
+    private final UserService userService;
     private final Map<String, Deque<String>> userNotifications = new ConcurrentHashMap<>();
 
-    public NotificationServiceImpl(EventRepository eventRepository) {
+    public NotificationServiceImpl(EventRepository eventRepository, NotificationRepository notificationRepository, UserService userService) {
         this.eventRepository = eventRepository;
+        this.notificationRepository = notificationRepository;
+        this.userService = userService;
     }
 
     @Override
@@ -137,5 +146,73 @@ public class NotificationServiceImpl implements NotificationService {
         while (userDeque.size() > MAX_NOTIFICATIONS) {
             userDeque.removeLast();
         }
+    }
+
+    @Override
+    public NotificationEntity createNotification(String message, NotificationType type, UserEntity user, String link) {
+        NotificationEntity notification = new NotificationEntity(message, type, user, link);
+        return notificationRepository.save(notification);
+    }
+
+    @Override
+    public void createEventStatusNotification(EventEntity event, NotificationType type) {
+        UserEntity creator = event.getOrganizer();
+        String message = "";
+        String link = "/events/details/" + event.getId();
+        
+        switch (type) {
+            case EVENT_APPROVED -> message = "Your event \"" + event.getTitle() + "\" has been approved.";
+            case EVENT_REJECTED -> message = "Your event \"" + event.getTitle() + "\" has been rejected.";
+            case EVENT_CANCELED -> message = "Your event \"" + event.getTitle() + "\" has been canceled.";
+            default -> message = "There's an update to your event \"" + event.getTitle() + "\".";
+        }
+        
+        createNotification(message, type, creator, link);
+    }
+
+    @Override
+    public void createPendingEventNotification(EventEntity event) {
+        List<UserEntity> admins = userService.getAllAdmins();
+        String message = "New event \"" + event.getTitle() + "\" by " + event.getOrganizer().getUsername() + " is waiting for approval.";
+        String link = "/users/admin/users";
+
+        for (UserEntity admin : admins) {
+            createNotification(message, NotificationType.NEW_EVENT_PENDING, admin, link);
+        }
+    }
+
+    @Override
+    public List<NotificationEntity> getNotificationsForUser(UserEntity user) {
+        return notificationRepository.findByUserOrderByCreatedAtDesc(user);
+    }
+
+    @Override
+    public List<NotificationEntity> getUnreadNotificationsForUser(UserEntity user) {
+        return notificationRepository.findByUserAndReadFalseOrderByCreatedAtDesc(user);
+    }
+
+    @Override
+    public long getUnreadNotificationCount(UserEntity user) {
+        return notificationRepository.countByUserAndReadFalse(user);
+    }
+
+    @Override
+    public void markAsRead(Long notificationId) {
+        notificationRepository.findById(notificationId).ifPresent(notification -> {
+            notification.setRead(true);
+            notificationRepository.save(notification);
+        });
+    }
+
+    @Override
+    public void markAllAsRead(UserEntity user) {
+        List<NotificationEntity> unreadNotifications = getUnreadNotificationsForUser(user);
+        unreadNotifications.forEach(notification -> notification.setRead(true));
+        notificationRepository.saveAll(unreadNotifications);
+    }
+
+    @Override
+    public void deleteNotification(Long notificationId) {
+        notificationRepository.deleteById(notificationId);
     }
 } 
