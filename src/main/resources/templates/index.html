@@ -58,8 +58,19 @@
                                     <i class="bi bi-people-fill me-1"></i>
                                     <span th:text="${event.attendees.size()}">0</span> attendees
                                 </span>
-                                <a th:href="@{/events/{id}(id=${event.id})}" class="btn btn-outline-primary">Details</a>
+                                <a th:href="@{/events/details/{id}(id=${event.id})}" class="btn btn-outline-primary">Details</a>
                             </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- No events message -->
+                <div th:if="${events.empty}" class="col-12 text-center py-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <i class="bi bi-calendar-x text-muted" style="font-size: 3rem;"></i>
+                            <h4 class="mt-3">No Events Available</h4>
+                            <p class="text-muted">There are no upcoming events at this time.</p>
+                            <a href="/events/create" sec:authorize="isAuthenticated()" class="btn btn-primary mt-2">Create an Event</a>
                         </div>
                     </div>
                 </div>

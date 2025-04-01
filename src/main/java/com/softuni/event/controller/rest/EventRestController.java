@@ -48,4 +48,19 @@ public class EventRestController {
         List<EventDetailDTO> events = eventService.getEventsByStatus(status);
         return ResponseEntity.ok(events);
     }
+
+    @GetMapping("/check-location-availability")
+    public ResponseEntity<Boolean> checkLocationAvailability(
+            @RequestParam Long locationId,
+            @RequestParam String eventDateTime,
+            @RequestParam(required = false) Long excludeEventId) {
+        
+        // Parse the date time string
+        LocalDateTime eventTime = LocalDateTime.parse(eventDateTime);
+        
+        // Check availability
+        boolean isAvailable = eventService.isLocationAvailable(locationId, eventTime, excludeEventId);
+        
+        return ResponseEntity.ok(isAvailable);
+    }
 } 

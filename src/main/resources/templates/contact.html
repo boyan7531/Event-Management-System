@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" 
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head th:replace="~{fragments/layout :: head('Contact Us')}">
+    <title>Contact Us - Event Management System</title>
+</head>
+
+<body>
+    <nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+    <div class="container my-5">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card shadow mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h2 class="mb-0">Contact Us</h2>
+                    </div>
+                    <div class="card-body">
+                        <!-- Success Message -->
+                        <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+                            <i class="bi bi-check-circle-fill me-2"></i>
+                            <span th:text="${successMessage}">Success message</span>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                        
+                        <p class="mb-4">Have a question or need assistance? Fill out the form below and we'll get back to you as soon as possible.</p>
+                        
+                        <form th:action="@{/contact}" method="post">
+                            <!-- Name -->
+                            <div class="mb-3">
+                                <label for="name" class="form-label">Your Name</label>
+                                <input type="text" class="form-control" id="name" name="name" required>
+                            </div>
+                            
+                            <!-- Email -->
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Email Address</label>
+                                <input type="email" class="form-control" id="email" name="email" required>
+                            </div>
+                            
+                            <!-- Subject -->
+                            <div class="mb-3">
+                                <label for="subject" class="form-label">Subject</label>
+                                <input type="text" class="form-control" id="subject" name="subject" required>
+                            </div>
+                            
+                            <!-- Message -->
+                            <div class="mb-3">
+                                <label for="message" class="form-label">Message</label>
+                                <textarea class="form-control" id="message" name="message" rows="5" required></textarea>
+                            </div>
+                            
+                            <!-- Submit Button -->
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-send"></i> Send Message
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card shadow">
+                    <div class="card-header bg-primary text-white">
+                        <h2 class="mb-0">Get In Touch</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-4">
+                            <h4><i class="bi bi-geo-alt-fill text-primary me-2"></i>Our Location</h4>
+                            <p>123 Event Street<br>Sofia, 1000<br>Bulgaria</p>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <h4><i class="bi bi-telephone-fill text-primary me-2"></i>Call Us</h4>
+                            <p>+359 2 123 4567<br>+359 88 765 4321</p>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <h4><i class="bi bi-envelope-fill text-primary me-2"></i>Email Us</h4>
+                            <p>info@eventhub.com<br>support@eventhub.com</p>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <h4><i class="bi bi-clock-fill text-primary me-2"></i>Business Hours</h4>
+                            <p>Monday - Friday: 9:00 AM - 6:00 PM<br>Saturday: 10:00 AM - 2:00 PM<br>Sunday: Closed</p>
+                        </div>
+                        
+                        <div class="social-icons mt-4">
+                            <h4>Follow Us</h4>
+                            <a href="#" class="btn btn-outline-primary me-2"><i class="bi bi-facebook"></i></a>
+                            <a href="#" class="btn btn-outline-primary me-2"><i class="bi bi-twitter"></i></a>
+                            <a href="#" class="btn btn-outline-primary me-2"><i class="bi bi-instagram"></i></a>
+                            <a href="#" class="btn btn-outline-primary me-2"><i class="bi bi-linkedin"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer th:replace="~{fragments/layout :: footer}"></footer>
+    
+    <th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html> 

@@ -21,8 +21,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.Month;
+import java.time.YearMonth;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -138,6 +141,11 @@ public class EventServiceImpl implements EventService {
         LocationEntity location = locationRepository.findById(eventCreateDTO.getLocationId())
                 .orElseThrow(() -> new ResourceNotFoundException("Location", "id", eventCreateDTO.getLocationId()));
         
+        // Check if location is available at the specified time
+        if (!isLocationAvailable(eventCreateDTO.getLocationId(), eventCreateDTO.getEventDate(), null)) {
+            throw new IllegalStateException("The location is already booked at this time. Please choose a different time or location.");
+        }
+        
         EventEntity eventEntity = new EventEntity();
         eventEntity.setTitle(eventCreateDTO.getTitle());
         eventEntity.setDescription(eventCreateDTO.getDescription());
@@ -169,6 +177,16 @@ public class EventServiceImpl implements EventService {
         
         LocationEntity location = locationRepository.findById(eventCreateDTO.getLocationId())
                 .orElseThrow(() -> new ResourceNotFoundException("Location", "id", eventCreateDTO.getLocationId()));
+        
+        // Check if location is available at the specified time
+        // Only check if date or location has changed
+        boolean dateChanged = !event.getEventDate().equals(eventCreateDTO.getEventDate());
+        boolean locationChanged = !event.getLocation().getId().equals(eventCreateDTO.getLocationId());
+        
+        if ((dateChanged || locationChanged) && 
+            !isLocationAvailable(eventCreateDTO.getLocationId(), eventCreateDTO.getEventDate(), id)) {
+            throw new IllegalStateException("The location is already booked at this time. Please choose a different time or location.");
+        }
         
         event.setTitle(eventCreateDTO.getTitle());
         event.setDescription(eventCreateDTO.getDescription());
@@ -306,6 +324,49 @@ public class EventServiceImpl implements EventService {
         eventRepository.save(event);
         
         return true;
+    }
+
+    @Override
+    public Map<Integer, List<EventDetailDTO>> getEventsByMonth(int year, Month month) {
+        // Get the start and end date for the given month
+        YearMonth yearMonth = YearMonth.of(year, month);
+        LocalDateTime startOfMonth = yearMonth.atDay(1).atStartOfDay();
+        LocalDateTime endOfMonth = yearMonth.atEndOfMonth().atTime(23, 59, 59);
+        
+        // Fetch all approved events for the month
+        List<EventEntity> monthEvents = eventRepository.findByEventDateBetweenAndStatus(
+                startOfMonth, 
+                endOfMonth, 
+                EventStatus.APPROVED
+        );
+        
+        // Group events by day of month
+        return monthEvents.stream()
+                .map(this::mapToDetailDTO)
+                .collect(Collectors.groupingBy(
+                        event -> event.getEventDate().getDayOfMonth()
+                ));
+    }
+
+    @Override
+    public boolean isLocationAvailable(Long locationId, LocalDateTime eventTime, Long excludeEventId) {
+        // Calculate event end time (assume events last 3 hours)
+        LocalDateTime eventEndTime = eventTime.plusHours(3);
+        
+        // Statuses to check for conflicts - we only care about APPROVED and PENDING events
+        List<EventStatus> conflictStatuses = List.of(EventStatus.APPROVED, EventStatus.PENDING);
+        
+        // Check for overlapping events
+        List<EventEntity> overlappingEvents = eventRepository.findOverlappingEvents(
+            locationId,
+            eventTime,
+            eventEndTime,
+            excludeEventId != null ? excludeEventId : -1L,
+            conflictStatuses
+        );
+        
+        // Location is available if there are no overlapping events
+        return overlappingEvents.isEmpty();
     }
     
     private EventDetailDTO mapToDetailDTO(EventEntity event) {

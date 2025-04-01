@@ -17,6 +17,12 @@
                         <h3 class="mb-0">Edit Event</h3>
                     </div>
                     <div class="card-body">
+                        <!-- Error message -->
+                        <div th:if="${errorMessage}" class="alert alert-danger mb-4" role="alert">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                            <span th:text="${errorMessage}">Error message</span>
+                        </div>
+                        
                         <form th:action="@{/events/edit/{id}(id=${eventId})}" th:object="${eventForm}" method="post">
                             
                             <!-- Title -->
@@ -118,6 +124,61 @@
                     $('#ticketPrice').val('0.00');
                 }
             }
+            
+            // Location availability checker
+            let availabilityTimeout;
+            function checkLocationAvailability() {
+                const locationId = $('#locationId').val();
+                const eventDate = $('#eventDate').val();
+                const eventId = window.location.pathname.split('/').pop(); // Get event ID from URL
+                
+                // Clear previous messages
+                $('#location-availability').remove();
+                
+                // Check if both fields have values
+                if (locationId && eventDate) {
+                    // Show loading message
+                    $('#locationId').after('<div id="location-availability" class="mt-2 text-info"><i class="bi bi-hourglass"></i> Checking availability...</div>');
+                    
+                    // Clear any pending requests
+                    if (availabilityTimeout) {
+                        clearTimeout(availabilityTimeout);
+                    }
+                    
+                    // Add a slight delay to avoid too many requests
+                    availabilityTimeout = setTimeout(function() {
+                        $.ajax({
+                            url: '/api/events/check-location-availability',
+                            type: 'GET',
+                            data: {
+                                locationId: locationId,
+                                eventDateTime: eventDate,
+                                excludeEventId: eventId
+                            },
+                            success: function(available) {
+                                $('#location-availability').remove();
+                                if (available) {
+                                    $('#locationId').after('<div id="location-availability" class="mt-2 text-success"><i class="bi bi-check-circle"></i> This location is available at the selected time</div>');
+                                } else {
+                                    $('#locationId').after('<div id="location-availability" class="mt-2 text-danger"><i class="bi bi-exclamation-triangle"></i> This location is already booked at the selected time</div>');
+                                }
+                            },
+                            error: function() {
+                                $('#location-availability').remove();
+                                $('#locationId').after('<div id="location-availability" class="mt-2 text-warning"><i class="bi bi-exclamation-circle"></i> Could not check availability</div>');
+                            }
+                        });
+                    }, 500);
+                }
+            }
+            
+            // Attach change event handlers
+            $('#locationId, #eventDate').change(function() {
+                checkLocationAvailability();
+            });
+            
+            // Check availability on page load (for existing date/location)
+            checkLocationAvailability();
         });
     </script>
 </body>

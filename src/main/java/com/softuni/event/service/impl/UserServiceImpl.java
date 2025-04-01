@@ -148,32 +148,39 @@ public class UserServiceImpl implements UserService {
                 .findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
         
-        UserRole userRole = UserRole.valueOf(role);
+        UserRole requestedRole = UserRole.valueOf(role);
         
-        // Check if user already has this role
-        Optional<UserRoleEntity> existingRole = userEntity
-                .getRoles()
-                .stream()
-                .filter(r -> r.getRole() == userRole)
+        // Handle special case for admin role
+        if (requestedRole == UserRole.USER) {
+            // Request to make user a regular user (remove ADMIN role)
+            Optional<UserRoleEntity> adminRole = userEntity.getRoles().stream()
+                .filter(r -> r.getRole() == UserRole.ADMIN)
                 .findFirst();
-        
-        if (existingRole.isPresent()) {
-            // If trying to remove ADMIN role, check that it's not the only role
-            if (userRole == UserRole.ADMIN && hasAdminRole(userEntity) && userEntity.getRoles().size() <= 1) {
-                throw new IllegalStateException("Cannot remove the only role from a user");
+            
+            if (adminRole.isPresent()) {
+                // Don't allow removing admin role from superadmin (ID 1)
+                if (userId == 1) {
+                    throw new IllegalStateException("Cannot remove ADMIN role from the super administrator");
+                }
+                
+                // Remove ADMIN role
+                userEntity.getRoles().remove(adminRole.get());
+                userRoleRepository.delete(adminRole.get());
             }
+        } else if (requestedRole == UserRole.ADMIN) {
+            // Request to make user an admin (add ADMIN role)
+            boolean hasAdminRole = userEntity.getRoles().stream()
+                .anyMatch(r -> r.getRole() == UserRole.ADMIN);
             
-            // Remove role
-            userEntity.getRoles().remove(existingRole.get());
-            userRoleRepository.delete(existingRole.get());
-        } else {
-            // Add role
-            UserRoleEntity newRole = new UserRoleEntity();
-            newRole.setRole(userRole);
-            newRole.setUser(userEntity);
-            newRole = userRoleRepository.save(newRole);
-            
-            userEntity.getRoles().add(newRole);
+            if (!hasAdminRole) {
+                // Add ADMIN role
+                UserRoleEntity newRole = new UserRoleEntity();
+                newRole.setRole(UserRole.ADMIN);
+                newRole.setUser(userEntity);
+                newRole = userRoleRepository.save(newRole);
+                
+                userEntity.getRoles().add(newRole);
+            }
         }
         
         userRepository.save(userEntity);

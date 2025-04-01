@@ -23,6 +23,7 @@ public class SecurityConfig {
                 .requestMatchers("/events/details/**").permitAll()
                 .requestMatchers("/api/**").permitAll()
                 .requestMatchers("/admin", "/users/admin/**").hasRole("ADMIN")
+                .requestMatchers("/locations/create", "/locations/edit/**", "/locations/delete/**").hasRole("ADMIN")
                 .requestMatchers("/events/create").authenticated()
                 .anyRequest().authenticated()
             )

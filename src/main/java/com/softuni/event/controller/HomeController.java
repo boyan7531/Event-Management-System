@@ -18,6 +18,7 @@ public class HomeController {
     @GetMapping("/")
     public String home(Model model) {
         model.addAttribute("upcomingEvents", eventService.getUpcomingEvents());
+        model.addAttribute("events", eventService.getEventsByStatus(EventStatus.APPROVED).stream().limit(3).toList());
         return "index";
     }
 

@@ -2,11 +2,14 @@ package com.softuni.event.controller;
 
 import com.softuni.event.model.dto.UserProfileDTO;
 import com.softuni.event.model.dto.UserRegisterDTO;
+import com.softuni.event.model.enums.EventStatus;
+import com.softuni.event.service.EventService;
 import com.softuni.event.service.NotificationService;
 import com.softuni.event.service.UserService;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -21,11 +24,18 @@ import jakarta.validation.Valid;
 public class UserController {
 
     private final UserService userService;
+    private final PasswordEncoder passwordEncoder;
     private final NotificationService notificationService;
+    private final EventService eventService;
 
-    public UserController(UserService userService, NotificationService notificationService) {
+    public UserController(UserService userService, 
+                         PasswordEncoder passwordEncoder,
+                         NotificationService notificationService,
+                         EventService eventService) {
         this.userService = userService;
+        this.passwordEncoder = passwordEncoder;
         this.notificationService = notificationService;
+        this.eventService = eventService;
     }
 
     @GetMapping("/register")
@@ -100,6 +110,13 @@ public class UserController {
     @GetMapping("/admin/users")
     public String adminUsersList(Model model) {
         model.addAttribute("users", userService.getAllUsers());
+        
+        // Add events categorized by status for admin dashboard
+        model.addAttribute("pendingEvents", eventService.getEventsByStatus(EventStatus.PENDING));
+        model.addAttribute("approvedEvents", eventService.getEventsByStatus(EventStatus.APPROVED));
+        model.addAttribute("rejectedEvents", eventService.getEventsByStatus(EventStatus.REJECTED));
+        model.addAttribute("canceledEvents", eventService.getEventsByStatus(EventStatus.CANCELED));
+        
         return "admin-users";
     }
 

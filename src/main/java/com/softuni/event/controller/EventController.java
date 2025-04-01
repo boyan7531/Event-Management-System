@@ -14,6 +14,10 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
+import java.time.Month;
+import java.time.YearMonth;
+import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/events")
@@ -66,8 +70,13 @@ public class EventController {
         try {
             Long eventId = eventService.createEvent(eventForm, userDetails.getUsername());
             return "redirect:/events/details/" + eventId;
+        } catch (IllegalStateException e) {
+            // Handle location availability error
+            model.addAttribute("errorMessage", e.getMessage());
+            model.addAttribute("locations", locationService.getAllLocations());
+            return "event-create";
         } catch (Exception e) {
-            // Handle the case when user is not found in the database or other errors
+            // Handle other errors
             model.addAttribute("errorMessage", "Error creating event: " + e.getMessage());
             model.addAttribute("locations", locationService.getAllLocations());
             return "event-create";
@@ -96,33 +105,52 @@ public class EventController {
     }
 
     @PostMapping("/{id}/approve")
-    public String approveEvent(@PathVariable Long id) {
+    public String approveEvent(@PathVariable Long id, @RequestParam(required = false) String redirectUrl) {
         eventService.changeEventStatus(id, EventStatus.APPROVED);
+        if (redirectUrl != null && !redirectUrl.isEmpty()) {
+            return "redirect:" + redirectUrl;
+        }
         return "redirect:/events/details/" + id;
     }
 
     @PostMapping("/{id}/reject")
-    public String rejectEvent(@PathVariable Long id) {
+    public String rejectEvent(@PathVariable Long id, @RequestParam(required = false) String redirectUrl) {
         eventService.changeEventStatus(id, EventStatus.REJECTED);
+        if (redirectUrl != null && !redirectUrl.isEmpty()) {
+            return "redirect:" + redirectUrl;
+        }
         return "redirect:/events/details/" + id;
     }
 
     @PostMapping("/{id}/cancel")
-    public String cancelEvent(@PathVariable Long id) {
+    public String cancelEvent(@PathVariable Long id, @RequestParam(required = false) String redirectUrl) {
         eventService.deleteEvent(id); // This will set status to CANCELED
+        if (redirectUrl != null && !redirectUrl.isEmpty()) {
+            return "redirect:" + redirectUrl;
+        }
         return "redirect:/events/my-events";
     }
 
     @PostMapping("/{id}/delete")
-    public String deleteEvent(@PathVariable Long id, @AuthenticationPrincipal UserDetails userDetails) {
+    public String deleteEvent(@PathVariable Long id, 
+                             @AuthenticationPrincipal UserDetails userDetails,
+                             @RequestParam(required = false) String redirectUrl) {
         EventDetailDTO event = eventService.getEventById(id);
         
-        // Only allow organizer to delete their own event
-        if (!event.getOrganizer().getUsername().equals(userDetails.getUsername())) {
+        // Check if user is admin or the event organizer
+        boolean isAdmin = userDetails.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+        
+        // Only allow organizer or admin to delete the event
+        if (!isAdmin && !event.getOrganizer().getUsername().equals(userDetails.getUsername())) {
             throw new RuntimeException("You are not authorized to delete this event");
         }
         
         eventService.permanentlyDeleteEvent(id);
+        
+        if (redirectUrl != null && !redirectUrl.isEmpty()) {
+            return "redirect:" + redirectUrl;
+        }
         return "redirect:/events/my-events";
     }
 
@@ -166,7 +194,62 @@ public class EventController {
             return "event-edit";
         }
         
-        eventService.updateEvent(id, eventForm);
-        return "redirect:/events/details/" + id;
+        try {
+            eventService.updateEvent(id, eventForm);
+            return "redirect:/events/details/" + id;
+        } catch (IllegalStateException e) {
+            // Handle location availability error
+            model.addAttribute("eventId", id);
+            model.addAttribute("errorMessage", e.getMessage());
+            model.addAttribute("locations", locationService.getAllLocations());
+            return "event-edit";
+        } catch (Exception e) {
+            // Handle other errors
+            model.addAttribute("eventId", id);
+            model.addAttribute("errorMessage", "Error updating event: " + e.getMessage());
+            model.addAttribute("locations", locationService.getAllLocations());
+            return "event-edit";
+        }
+    }
+
+    @GetMapping("/calendar")
+    public String showCalendar(
+            @RequestParam(required = false, defaultValue = "#{T(java.time.LocalDate).now().getYear()}") Integer year,
+            @RequestParam(required = false) Integer month,
+            Model model) {
+        
+        // If month is not provided, use current month
+        if (month == null) {
+            month = java.time.LocalDate.now().getMonthValue();
+        }
+        
+        // Validate month range
+        if (month < 1 || month > 12) {
+            month = java.time.LocalDate.now().getMonthValue();
+        }
+        
+        // Get Month enum from month number
+        Month currentMonth = Month.of(month);
+        
+        // Get year/month for calculations
+        YearMonth yearMonth = YearMonth.of(year, month);
+        
+        // Get events for the month
+        Map<Integer, List<EventDetailDTO>> eventsByDay = eventService.getEventsByMonth(year, currentMonth);
+        
+        // Add all necessary data to the model
+        model.addAttribute("currentYear", year);
+        model.addAttribute("currentMonth", currentMonth);
+        model.addAttribute("daysInMonth", yearMonth.lengthOfMonth());
+        model.addAttribute("eventsByDay", eventsByDay);
+        model.addAttribute("firstDayOfMonth", yearMonth.atDay(1).getDayOfWeek().getValue());
+        
+        // For navigation
+        model.addAttribute("prevMonth", month > 1 ? month - 1 : 12);
+        model.addAttribute("prevYear", month > 1 ? year : year - 1);
+        model.addAttribute("nextMonth", month < 12 ? month + 1 : 1);
+        model.addAttribute("nextYear", month < 12 ? year : year + 1);
+        
+        return "event-calendar";
     }
 } 

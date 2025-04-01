@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head th:replace="~{fragments/layout :: head('Event Calendar')}">
+    <title>Event Calendar - Event Management System</title>
+</head>
+
+<body>
+    <nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+    <div class="container my-5">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <div class="d-flex justify-content-between align-items-center">
+                    <!-- Previous Month Navigation -->
+                    <a th:href="@{/events/calendar(year=${prevYear},month=${prevMonth})}" class="btn btn-outline-light">
+                        <i class="bi bi-chevron-left"></i> Previous
+                    </a>
+                    
+                    <!-- Current Month and Year -->
+                    <h2 class="mb-0" th:text="${currentMonth.toString() + ' ' + currentYear}">Month Year</h2>
+                    
+                    <!-- Next Month Navigation -->
+                    <a th:href="@{/events/calendar(year=${nextYear},month=${nextMonth})}" class="btn btn-outline-light">
+                        Next <i class="bi bi-chevron-right"></i>
+                    </a>
+                </div>
+            </div>
+            
+            <div class="card-body">
+                <!-- Calendar Grid -->
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="text-center">Monday</th>
+                                <th class="text-center">Tuesday</th>
+                                <th class="text-center">Wednesday</th>
+                                <th class="text-center">Thursday</th>
+                                <th class="text-center">Friday</th>
+                                <th class="text-center">Saturday</th>
+                                <th class="text-center">Sunday</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Calendar Weeks -->
+                            <tr th:each="week : ${#numbers.sequence(0, 5)}">
+                                <!-- Days in Week -->
+                                <td th:each="dayOfWeek : ${#numbers.sequence(1, 7)}" 
+                                    th:with="dayNumber = ${week * 7 + dayOfWeek - firstDayOfMonth + 1}"
+                                    th:class="${dayNumber > 0 && dayNumber <= daysInMonth ? '' : 'bg-light'}" 
+                                    style="height: 120px; width: 14.28%; vertical-align: top;">
+                                    
+                                    <!-- Day Number -->
+                                    <div th:if="${dayNumber > 0 && dayNumber <= daysInMonth}" class="d-flex justify-content-between align-items-start">
+                                        <span class="badge bg-secondary" th:text="${dayNumber}">1</span>
+                                        <a th:if="${eventsByDay.containsKey(dayNumber)}" 
+                                           data-bs-toggle="collapse" 
+                                           th:href="${'#events-day-' + dayNumber}" 
+                                           role="button" 
+                                           aria-expanded="false" 
+                                           class="badge bg-primary">
+                                            <i class="bi bi-calendar-event"></i> 
+                                            <span th:text="${eventsByDay.get(dayNumber).size()}">3</span> Events
+                                        </a>
+                                    </div>
+                                    
+                                    <!-- Events for the Day -->
+                                    <div th:if="${dayNumber > 0 && dayNumber <= daysInMonth && eventsByDay.containsKey(dayNumber)}" 
+                                         th:id="${'events-day-' + dayNumber}" 
+                                         class="collapse mt-2">
+                                        <div th:each="event : ${eventsByDay.get(dayNumber)}" class="mb-1">
+                                            <a th:href="@{/events/details/{id}(id=${event.id})}" 
+                                               class="text-decoration-none">
+                                                <div class="card card-body p-2 bg-light">
+                                                    <small th:text="${event.title}">Event Title</small>
+                                                    <small class="text-muted" th:text="${#temporals.format(event.eventDate, 'HH:mm')}">10:00</small>
+                                                </div>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="card-footer">
+                <div class="d-flex justify-content-between">
+                    <a href="/events" class="btn btn-outline-secondary">
+                        <i class="bi bi-list"></i> Event List
+                    </a>
+                    <a href="/events/create" class="btn btn-success" sec:authorize="isAuthenticated()">
+                        <i class="bi bi-plus-circle"></i> Create Event
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer th:replace="~{fragments/layout :: footer}"></footer>
+    
+    <th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html> 
