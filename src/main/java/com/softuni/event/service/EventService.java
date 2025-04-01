@@ -16,6 +16,7 @@ public interface EventService {
     List<EventDetailDTO> getJoinedEvents(String username);
     
     EventDetailDTO getEventById(Long id);
+    EventDetailDTO getEventById(Long id, String username);
     Long createEvent(EventCreateDTO eventCreateDTO, String organizerUsername);
     void updateEvent(Long id, EventCreateDTO eventCreateDTO);
     void deleteEvent(Long id);

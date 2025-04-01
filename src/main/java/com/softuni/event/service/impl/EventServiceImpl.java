@@ -114,6 +114,22 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
+    public EventDetailDTO getEventById(Long id, String username) {
+        EventEntity event = eventRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Event", "id", id));
+        
+        UserEntity user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        
+        EventDetailDTO dto = mapToDetailDTO(event);
+        
+        // Check if the user has joined this event
+        dto.setJoinedByCurrentUser(event.getAttendees().contains(user));
+        
+        return dto;
+    }
+
+    @Override
     @Transactional
     public Long createEvent(EventCreateDTO eventCreateDTO, String organizerUsername) {
         UserEntity organizer = userRepository.findByUsername(organizerUsername)

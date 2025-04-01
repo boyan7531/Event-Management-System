@@ -30,8 +30,13 @@ public class EventController {
     }
 
     @GetMapping("/details/{id}")
-    public String eventDetails(@PathVariable Long id, Model model) {
-        EventDetailDTO event = eventService.getEventById(id);
+    public String eventDetails(@PathVariable Long id, Model model, @AuthenticationPrincipal UserDetails userDetails) {
+        EventDetailDTO event;
+        if (userDetails != null) {
+            event = eventService.getEventById(id, userDetails.getUsername());
+        } else {
+            event = eventService.getEventById(id);
+        }
         model.addAttribute("event", event);
         return "event-details";
     }

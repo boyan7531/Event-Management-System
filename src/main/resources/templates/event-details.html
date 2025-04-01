@@ -131,7 +131,7 @@
                     <div class="card-body">
                         <div sec:authorize="isAuthenticated()">
                             <!-- For Approved events that haven't passed yet -->
-                            <div th:if="${event.status.name() == 'APPROVED' && event.eventDate.isAfter(T(java.time.LocalDateTime).now())}">
+                            <div th:if="${event.status.name() == 'APPROVED' && event.eventDate.isAfter(T(java.time.LocalDateTime).now()) && (event.registrationDeadline == null || event.registrationDeadline.isAfter(T(java.time.LocalDateTime).now()))}">
                                 <!-- User has not joined -->
                                 <div th:unless="${event.joinedByCurrentUser}">
                                     <p>Join this event to show your interest and receive updates!</p>
@@ -153,6 +153,11 @@
                                         </button>
                                     </form>
                                 </div>
+                            </div>
+                            
+                            <!-- For events with passed registration deadline -->
+                            <div th:if="${event.status.name() == 'APPROVED' && event.registrationDeadline != null && event.registrationDeadline.isBefore(T(java.time.LocalDateTime).now()) && event.eventDate.isAfter(T(java.time.LocalDateTime).now())}" class="alert alert-warning">
+                                <i class="bi bi-clock-history me-2"></i> Registration deadline for this event has passed.
                             </div>
                             
                             <!-- For events that have passed -->
@@ -240,7 +245,7 @@
                         </p>
                         <!-- Add map link -->
                         <a href="#" class="btn btn-outline-info w-100" 
-                           th:href="@{'https://maps.google.com/?q=' + ${event.location.address} + ', ' + ${event.location.city}}"
+                           th:href="@{'https://maps.google.com/maps?q=' + ${#strings.isEmpty(event.location.address) ? event.location.name : event.location.address} + ',+' + ${event.location.city} + ',+' + ${event.location.country}}"
                            target="_blank">
                             <i class="bi bi-geo-alt me-2"></i> View on Map
                         </a>
