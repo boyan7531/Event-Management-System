@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" 
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head th:replace="~{fragments/layout :: head('Admin - Contact Messages')}">
+    <title>Admin - Contact Messages - Event Management System</title>
+</head>
+
+<body>
+    <nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+    <div class="container my-5">
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h1>Contact Messages</h1>
+                    <div>
+                        <a th:href="@{/users/admin/users}" class="btn btn-outline-primary me-2">
+                            <i class="bi bi-people"></i> Users
+                        </a>
+                        <a th:href="@{/admin/messages}" th:class="${unreadOnly ? 'btn btn-outline-primary' : 'btn btn-primary'}">
+                            <i class="bi bi-envelope"></i> All Messages
+                        </a>
+                        <a th:href="@{/admin/messages/unread}" th:class="${unreadOnly ? 'btn btn-primary' : 'btn btn-outline-primary'}">
+                            <i class="bi bi-envelope-exclamation"></i> Unread 
+                            <span th:if="${unreadCount > 0}" class="badge bg-danger" th:text="${unreadCount}">3</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Success message -->
+        <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show mb-4" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i>
+            <span th:text="${successMessage}">Success message</span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+
+        <div class="card shadow">
+            <div class="card-body">
+                <div th:if="${#lists.isEmpty(messages)}" class="text-center py-5">
+                    <i class="bi bi-envelope-open display-1 text-muted mb-3"></i>
+                    <h3 class="text-muted" th:text="${unreadOnly ? 'No unread messages' : 'No messages found'}">No messages</h3>
+                </div>
+                
+                <div th:unless="${#lists.isEmpty(messages)}" class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Status</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Subject</th>
+                                <th>Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="message : ${messages}" th:class="${!message.read ? 'table-primary fw-bold' : ''}">
+                                <td>
+                                    <i th:if="${!message.read}" class="bi bi-envelope-fill text-primary" title="Unread"></i>
+                                    <i th:unless="${!message.read}" class="bi bi-envelope-open text-muted" title="Read"></i>
+                                </td>
+                                <td th:text="${message.name}">John Doe</td>
+                                <td th:text="${message.email}">john@example.com</td>
+                                <td th:text="${message.subject}">Subject</td>
+                                <td th:text="${#temporals.format(message.createdAt, 'MMM dd, yyyy HH:mm')}">Apr 15, 2025</td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <a th:href="@{/admin/messages/view/{id}(id=${message.id})}" class="btn btn-sm btn-outline-primary">
+                                            <i class="bi bi-eye"></i> View
+                                        </a>
+                                        <form th:if="${!message.read}" th:action="@{/admin/messages/mark-read/{id}(id=${message.id})}" method="post" class="d-inline">
+                                            <button type="submit" class="btn btn-sm btn-outline-success">
+                                                <i class="bi bi-check2-circle"></i> Mark Read
+                                            </button>
+                                        </form>
+                                        <form th:action="@{/admin/messages/delete/{id}(id=${message.id})}" method="post" class="d-inline"
+                                              onsubmit="return confirm('Are you sure you want to delete this message? This action cannot be undone.')">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                <i class="bi bi-trash"></i> Delete
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer th:replace="~{fragments/layout :: footer}"></footer>
+    
+    <th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html> 

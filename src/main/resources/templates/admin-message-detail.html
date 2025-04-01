@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" 
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head th:replace="~{fragments/layout :: head('View Message')}">
+    <title>View Message - Event Management System</title>
+</head>
+
+<body>
+    <nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+    <div class="container my-5">
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <div class="d-flex align-items-center">
+                    <a th:href="@{/admin/messages}" class="btn btn-outline-primary me-3">
+                        <i class="bi bi-arrow-left"></i> Back to Messages
+                    </a>
+                    <h1 class="mb-0" th:text="${message.subject}">Message Subject</h1>
+                </div>
+            </div>
+        </div>
+
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <span class="fs-5" th:text="${'From: ' + message.name + ' <' + message.email + '>'}">From: John Doe (john@example.com)</span>
+                        <span class="ms-4" th:text="${#temporals.format(message.createdAt, 'MMM dd, yyyy HH:mm')}">Apr 15, 2025</span>
+                    </div>
+                    <div class="d-flex">
+                        <form th:if="${!message.read}" th:action="@{/admin/messages/mark-read/{id}(id=${message.id})}" method="post" class="me-2">
+                            <button type="submit" class="btn btn-sm btn-light">
+                                <i class="bi bi-check2-circle"></i> Mark as Read
+                            </button>
+                        </form>
+                        <form th:action="@{/admin/messages/delete/{id}(id=${message.id})}" method="post" 
+                              onsubmit="return confirm('Are you sure you want to delete this message? This action cannot be undone.')">
+                            <button type="submit" class="btn btn-sm btn-danger">
+                                <i class="bi bi-trash"></i> Delete
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <h5>Sender Details</h5>
+                        <p class="mb-2"><strong>Name:</strong> <span th:text="${message.name}">John Doe</span></p>
+                        <p class="mb-2"><strong>Email:</strong> <a th:href="${'mailto:' + message.email}" th:text="${message.email}">john@example.com</a></p>
+                        <p class="mb-0"><strong>Sent:</strong> <span th:text="${#temporals.format(message.createdAt, 'MMMM dd, yyyy HH:mm')}">April 15, 2025 14:30</span></p>
+                    </div>
+                    <div class="col-md-6">
+                        <h5>Message Status</h5>
+                        <p class="mb-2">
+                            <strong>Status:</strong>
+                            <span th:if="${message.read}" class="badge bg-success">Read</span>
+                            <span th:unless="${message.read}" class="badge bg-primary">Unread</span>
+                        </p>
+                        <p class="mb-0"><strong>Message ID:</strong> <span th:text="${message.id}">123</span></p>
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <h5>Subject</h5>
+                    <p th:text="${message.subject}" class="fs-5">Message Subject</p>
+                </div>
+                
+                <div>
+                    <h5>Message</h5>
+                    <div class="card">
+                        <div class="card-body" style="background-color: #212529 !important; color: #ffffff;">
+                            <p th:text="${message.message}" style="white-space: pre-line; word-wrap: break-word; overflow-wrap: break-word;">Message content...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <div class="d-flex justify-content-between">
+                    <a th:href="@{/admin/messages}" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left"></i> Back to Messages
+                    </a>
+                    <a th:href="${'mailto:' + message.email + '?subject=Re: ' + message.subject}" class="btn btn-primary">
+                        <i class="bi bi-reply-fill"></i> Reply via Email
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer th:replace="~{fragments/layout :: footer}"></footer>
+    
+    <th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html> 

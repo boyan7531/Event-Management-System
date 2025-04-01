@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head('Help - Event Management System')}">
+    <title>Help - Event Management System</title>
+</head>
+<body>
+
+<!-- Navigation -->
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<!-- Help Section -->
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <h1 class="text-center mb-5">Help Center</h1>
+            
+            <div class="card mb-4">
+                <div class="card-header bg-dark text-white">
+                    <h2 class="h4 mb-0">Getting Started</h2>
+                </div>
+                <div class="card-body bg-dark text-white">
+                    <h3 class="h5">1. Creating an Account</h3>
+                    <p>To fully utilize our platform, you need to create an account:</p>
+                    <ul>
+                        <li>Click the "Register" button in the navigation bar</li>
+                        <li>Fill in your details (name, email, password)</li>
+                        <li>Verify your email address</li>
+                        <li>Log in using your credentials</li>
+                    </ul>
+                    
+                    <h3 class="h5">2. Exploring Events</h3>
+                    <p>You can browse events in several ways:</p>
+                    <ul>
+                        <li>View upcoming events on the homepage</li>
+                        <li>Browse all events through the "Events" page</li>
+                        <li>Use the search bar to find specific events</li>
+                        <li>Check the calendar view for events by date</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="card mb-4">
+                <div class="card-header bg-dark text-white">
+                    <h2 class="h4 mb-0">Creating Events</h2>
+                </div>
+                <div class="card-body bg-dark text-white">
+                    <p>To create a new event:</p>
+                    <ol>
+                        <li>Click "Create Event" in the navigation menu or on the events page</li>
+                        <li>Fill out all required information:
+                            <ul>
+                                <li>Event title and description</li>
+                                <li>Date and time</li>
+                                <li>Location</li>
+                                <li>Registration deadline</li>
+                                <li>Maximum participants (if applicable)</li>
+                            </ul>
+                        </li>
+                        <li>Submit your event for approval</li>
+                        <li>Wait for admin approval before your event is published</li>
+                    </ol>
+                    
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle me-2"></i>
+                        Your event must be approved by an administrator before it appears on the platform.
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card mb-4">
+                <div class="card-header bg-dark text-white">
+                    <h2 class="h4 mb-0">Managing Event Registration</h2>
+                </div>
+                <div class="card-body bg-dark text-white">
+                    <h3 class="h5">Joining Events</h3>
+                    <p>To register for an event:</p>
+                    <ol>
+                        <li>Navigate to the event details page</li>
+                        <li>Click the "Join Event" button</li>
+                        <li>Confirm your registration</li>
+                    </ol>
+                    
+                    <h3 class="h5">Leaving Events</h3>
+                    <p>If you can no longer attend an event:</p>
+                    <ol>
+                        <li>Go to the event details page or your "My Events" section</li>
+                        <li>Click the "Leave Event" button</li>
+                        <li>Confirm your decision</li>
+                    </ol>
+                    
+                    <div class="alert alert-warning">
+                        <i class="bi bi-exclamation-triangle me-2"></i>
+                        You cannot join an event after the registration deadline has passed.
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card mb-4">
+                <div class="card-header bg-dark text-white">
+                    <h2 class="h4 mb-0">Troubleshooting</h2>
+                </div>
+                <div class="card-body bg-dark text-white">
+                    <h3 class="h5">Common Issues</h3>
+                    <div class="table-responsive">
+                        <table class="table table-dark">
+                            <thead>
+                                <tr>
+                                    <th>Issue</th>
+                                    <th>Solution</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Cannot log in</td>
+                                    <td>Check your credentials or use the "Forgot Password" link</td>
+                                </tr>
+                                <tr>
+                                    <td>Event not showing</td>
+                                    <td>Your event may still be pending approval</td>
+                                </tr>
+                                <tr>
+                                    <td>Cannot register for event</td>
+                                    <td>The event may be full or past the registration deadline</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center mt-5">
+                <h3 class="mb-4">Need More Assistance?</h3>
+                <p>Check our <a href="/faq" class="text-primary">FAQ</a> for more information or <a href="/contact" class="text-primary">contact us</a> directly.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+
+<!-- Scripts -->
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+
+<style>
+    .card {
+        border: none;
+        box-shadow: 0 .5rem 1rem rgba(0,0,0,.15);
+    }
+    .card-header {
+        border-bottom: none;
+    }
+    .table-dark {
+        background-color: inherit;
+    }
+</style>
+
+</body>
+</html> 

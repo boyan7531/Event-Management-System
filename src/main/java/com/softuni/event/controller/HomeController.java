@@ -32,4 +32,14 @@ public class HomeController {
     public String about() {
         return "about";
     }
+
+    @GetMapping("/faq")
+    public String faq() {
+        return "faq";
+    }
+
+    @GetMapping("/help")
+    public String help() {
+        return "help";
+    }
 } 

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head('FAQ - Event Management System')}">
+    <title>FAQ - Event Management System</title>
+</head>
+<body>
+
+<!-- Navigation -->
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<!-- FAQ Section -->
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <h1 class="text-center mb-5">Frequently Asked Questions</h1>
+            
+            <div class="accordion" id="faqAccordion">
+                <div class="accordion-item mb-3">
+                    <h2 class="accordion-header" id="headingOne">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                            How do I create an event?
+                        </button>
+                    </h2>
+                    <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            <p>Creating an event is easy! Simply log in to your account, click on the "Create Event" button in the navigation menu or on the events page. Fill out the event details form with information such as title, description, date, time, location, and any additional details. Once submitted, your event will be reviewed by our administrators and published once approved.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="accordion-item mb-3">
+                    <h2 class="accordion-header" id="headingTwo">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                            How do I register for an event?
+                        </button>
+                    </h2>
+                    <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            <p>To register for an event, navigate to the event's details page by clicking on the event card from the events list. On the event details page, you'll find a "Join Event" button if registration is still open. Click this button to register. You can view all events you've registered for on your "My Events" page accessible from your profile dropdown.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="accordion-item mb-3">
+                    <h2 class="accordion-header" id="headingThree">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                            Can I cancel my registration?
+                        </button>
+                    </h2>
+                    <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            <p>Yes, you can cancel your registration at any time before the event starts. Go to the event details page or your "My Events" section and click the "Leave Event" button. Your spot will be freed up for others who might want to attend.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="accordion-item mb-3">
+                    <h2 class="accordion-header" id="headingFour">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                            What happens if an event is canceled?
+                        </button>
+                    </h2>
+                    <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            <p>If an event is canceled by the organizer or administrator, all registered participants will be automatically notified. The event will be marked as "Canceled" on the platform, and it will appear in your "My Events" section with this status.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="accordion-item mb-3">
+                    <h2 class="accordion-header" id="headingFive">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
+                            How can I contact the event organizer?
+                        </button>
+                    </h2>
+                    <div id="collapseFive" class="accordion-collapse collapse" aria-labelledby="headingFive" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            <p>You can contact the event organizer through the event details page. Each event has contact information for the organizer, which may include an email address or phone number. Alternatively, you can use our "Contact Us" form to reach out to our support team who can assist in connecting you with the event organizer.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="accordion-item mb-3">
+                    <h2 class="accordion-header" id="headingSix">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSix" aria-expanded="false" aria-controls="collapseSix">
+                            Is my personal information secure?
+                        </button>
+                    </h2>
+                    <div id="collapseSix" class="accordion-collapse collapse" aria-labelledby="headingSix" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            <p>We take data privacy and security very seriously. All personal information is encrypted and stored securely. We only collect information necessary for the functioning of the platform and never share your data with third parties without your explicit consent. For more details, please refer to our Terms of Service.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center mt-5">
+                <h3 class="mb-4">Still Have Questions?</h3>
+                <p>If you didn't find the answer you were looking for, please visit our <a href="/contact">Contact Us</a> page to get in touch with our support team.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+
+<!-- Scripts -->
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+
+<style>
+    .accordion-body {
+        background-color: #212529;
+        color: #ffffff;
+    }
+</style>
+
+</body>
+</html> 

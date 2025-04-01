@@ -41,7 +41,21 @@
                         <a class="nav-link" href="/locations">Locations</a>
                     </li>
                     <li class="nav-item" sec:authorize="hasRole('ADMIN')">
-                        <a class="nav-link" href="/admin">Admin</a>
+                        <div class="dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" id="adminDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-shield-fill me-1"></i>Admin
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="adminDropdown">
+                                <li><a class="dropdown-item" href="/users/admin/users"><i class="bi bi-speedometer2 me-2"></i>Dashboard</a></li>
+                                <li><a class="dropdown-item" href="/users/admin/users"><i class="bi bi-people me-2"></i>Users</a></li>
+                                <li><a class="dropdown-item" href="/admin/messages">
+                                    <i class="bi bi-envelope me-2"></i>Messages
+                                    <span id="unreadBadge" class="badge bg-danger ms-1" style="display:none;">0</span>
+                                </a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="/locations"><i class="bi bi-geo-alt me-2"></i>Locations</a></li>
+                            </ul>
+                        </div>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="/about">About</a>
@@ -82,10 +96,10 @@
                     <h5>About Event Hub</h5>
                     <p class="text-muted">We connect people through memorable events. Join us to discover and create experiences that matter.</p>
                     <div class="social-icons mt-3">
-                        <a href="#" class="me-3"><i class="bi bi-facebook"></i></a>
-                        <a href="#" class="me-3"><i class="bi bi-twitter"></i></a>
-                        <a href="#" class="me-3"><i class="bi bi-instagram"></i></a>
-                        <a href="#" class="me-3"><i class="bi bi-linkedin"></i></a>
+                        <a href="https://facebook.com" target="_blank" class="me-3"><i class="bi bi-facebook"></i></a>
+                        <a href="https://twitter.com" target="_blank" class="me-3"><i class="bi bi-twitter"></i></a>
+                        <a href="https://instagram.com" target="_blank" class="me-3"><i class="bi bi-instagram"></i></a>
+                        <a href="https://linkedin.com" target="_blank" class="me-3"><i class="bi bi-linkedin"></i></a>
                     </div>
                 </div>
                 <div class="col-md-2 col-6 mb-4 mb-md-0">
@@ -93,7 +107,6 @@
                     <ul class="list-unstyled">
                         <li><a href="/events">Browse Events</a></li>
                         <li><a href="/events/create">Create Event</a></li>
-                        <li><a href="/events/categories">Categories</a></li>
                         <li><a href="/events/calendar">Calendar</a></li>
                     </ul>
                 </div>
@@ -129,6 +142,9 @@
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
         <!-- Custom JS -->
+        <style>
+            /* Remove the no-hover class styles as they're no longer needed */
+        </style>
     </th:block>
 </body>
 
