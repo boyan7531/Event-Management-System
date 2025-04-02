@@ -1,5 +1,6 @@
 package com.softuni.event.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.softuni.event.model.enums.UserRole;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -17,6 +18,7 @@ public class UserRoleEntity extends BaseEntity {
     @Column(nullable = false)
     private UserRole role;
 
+    @JsonBackReference(value = "user-roles")
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private UserEntity user;

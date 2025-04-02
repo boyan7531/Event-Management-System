@@ -1,5 +1,8 @@
 package com.softuni.event.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,14 +27,17 @@ public class TicketEntity extends BaseEntity {
     @Column(nullable = false)
     private boolean used;
 
+    @JsonBackReference(value = "event-tickets")
     @ManyToOne
     @JoinColumn(name = "event_id", nullable = false)
     private EventEntity event;
 
+    @JsonBackReference(value = "user-tickets")
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private UserEntity user;
 
+    @JsonManagedReference(value = "ticket-payment")
     @OneToOne(mappedBy = "ticket")
     private PaymentEntity payment;
 

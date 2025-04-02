@@ -1,5 +1,8 @@
 package com.softuni.event.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.softuni.event.model.enums.EventStatus;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -43,6 +46,7 @@ public class EventEntity extends BaseEntity {
     @Column(nullable = false)
     private EventStatus status;
 
+    @JsonManagedReference(value = "user-organized-events")
     @ManyToOne
     @JoinColumn(name = "organizer_id", nullable = false)
     private UserEntity organizer;
@@ -51,6 +55,7 @@ public class EventEntity extends BaseEntity {
     @JoinColumn(name = "location_id", nullable = false)
     private LocationEntity location;
 
+    @JsonManagedReference(value = "user-attended-events")
     @ManyToMany
     @JoinTable(
             name = "event_attendees",
@@ -59,6 +64,7 @@ public class EventEntity extends BaseEntity {
     )
     private Set<UserEntity> attendees = new HashSet<>();
 
+    @JsonManagedReference(value = "event-tickets")
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL)
     private Set<TicketEntity> tickets = new HashSet<>();
 } 

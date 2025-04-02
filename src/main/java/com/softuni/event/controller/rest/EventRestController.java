@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -29,7 +30,7 @@ public class EventRestController {
     
     @GetMapping(value = "/check-location-availability", 
                 produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.TEXT_PLAIN_VALUE})
-    public ResponseEntity<?> checkLocationAvailability(
+    public ResponseEntity<Map<String, Object>> checkLocationAvailability(
             @RequestParam Long locationId,
             @RequestParam String eventDateTime,
             @RequestParam(required = false) Long excludeEventId) {
@@ -41,10 +42,17 @@ public class EventRestController {
             // Check availability
             boolean isAvailable = eventService.isLocationAvailable(locationId, eventTime, excludeEventId);
             
-            // Return result as a map, which will be converted to JSON
-            return ResponseEntity.ok(Map.of("available", isAvailable));
+            // Create a simple map response instead of complex object
+            Map<String, Object> response = new HashMap<>();
+            response.put("available", isAvailable);
+            response.put("locationId", locationId);
+            response.put("eventDateTime", eventDateTime);
+            
+            return ResponseEntity.ok(response);
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("error", e.getMessage());
+            return ResponseEntity.badRequest().body(errorResponse);
         }
     }
     

@@ -1,5 +1,8 @@
 package com.softuni.event.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,6 +24,7 @@ public class UserEntity extends BaseEntity {
     @Column(nullable = false, unique = true)
     private String email;
 
+    @JsonIgnore
     @Column(nullable = false)
     private String password;
 
@@ -32,18 +36,23 @@ public class UserEntity extends BaseEntity {
 
     private String phone;
 
+    @JsonManagedReference(value = "user-roles")
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Set<UserRoleEntity> roles = new HashSet<>();
 
+    @JsonBackReference(value = "user-organized-events")
     @OneToMany(mappedBy = "organizer")
     private Set<EventEntity> organizedEvents = new HashSet<>();
 
+    @JsonBackReference(value = "user-attended-events")
     @ManyToMany(mappedBy = "attendees")
     private Set<EventEntity> attendedEvents = new HashSet<>();
 
+    @JsonBackReference(value = "user-tickets")
     @OneToMany(mappedBy = "user")
     private Set<TicketEntity> tickets = new HashSet<>();
 
+    @JsonBackReference(value = "user-payments")
     @OneToMany(mappedBy = "user")
     private Set<PaymentEntity> payments = new HashSet<>();
     
