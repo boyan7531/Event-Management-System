@@ -84,7 +84,7 @@
                                                 </button>
                                                 <ul class="dropdown-menu dropdown-menu-end">
                                                     <li>
-                                                        <form th:action="@{/events/{id}/cancel(id=${event.id})}" method="post" class="d-inline">
+                                                        <form th:if="${event.eventDate.isAfter(T(java.time.LocalDateTime).now())}" th:action="@{/events/{id}/cancel(id=${event.id})}" method="post" class="d-inline">
                                                             <button type="submit" class="dropdown-item text-warning">
                                                                 <i class="bi bi-x-circle me-1"></i>Cancel Event
                                                             </button>
