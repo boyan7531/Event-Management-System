@@ -146,6 +146,12 @@ public class EventServiceImpl implements EventService {
             throw new IllegalStateException("The location is already booked at this time. Please choose a different time or location.");
         }
         
+        // Check if registration deadline is after event date
+        if (eventCreateDTO.getRegistrationDeadline() != null && 
+            eventCreateDTO.getRegistrationDeadline().isAfter(eventCreateDTO.getEventDate())) {
+            throw new IllegalStateException("Registration deadline cannot be after the event date.");
+        }
+        
         EventEntity eventEntity = new EventEntity();
         eventEntity.setTitle(eventCreateDTO.getTitle());
         eventEntity.setDescription(eventCreateDTO.getDescription());
@@ -186,6 +192,12 @@ public class EventServiceImpl implements EventService {
         if ((dateChanged || locationChanged) && 
             !isLocationAvailable(eventCreateDTO.getLocationId(), eventCreateDTO.getEventDate(), id)) {
             throw new IllegalStateException("The location is already booked at this time. Please choose a different time or location.");
+        }
+        
+        // Check if registration deadline is after event date
+        if (eventCreateDTO.getRegistrationDeadline() != null && 
+            eventCreateDTO.getRegistrationDeadline().isAfter(eventCreateDTO.getEventDate())) {
+            throw new IllegalStateException("Registration deadline cannot be after the event date.");
         }
         
         event.setTitle(eventCreateDTO.getTitle());

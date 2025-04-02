@@ -21,6 +21,8 @@ public class SecurityConfig {
                 .requestMatchers("/", "/about", "/events", "/css/**", "/js/**", "/images/**").permitAll()
                 .requestMatchers("/users/register", "/users/login").permitAll()
                 .requestMatchers("/events/details/**").permitAll()
+                .requestMatchers("/faq", "/terms", "/events/calendar").permitAll()
+                .requestMatchers("/error-page").permitAll()
                 .requestMatchers("/api/**").permitAll()
                 .requestMatchers("/admin", "/users/admin/**").hasRole("ADMIN")
                 .requestMatchers("/locations/create", "/locations/edit/**", "/locations/delete/**").hasRole("ADMIN")
@@ -37,6 +39,9 @@ public class SecurityConfig {
                 .logoutUrl("/logout")
                 .logoutSuccessUrl("/")
                 .permitAll()
+            )
+            .exceptionHandling(exceptions -> exceptions
+                .accessDeniedPage("/error-page")
             )
             .securityContext(securityContext -> securityContext
                 .securityContextRepository(securityContextRepository())

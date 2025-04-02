@@ -150,14 +150,18 @@
                         $.ajax({
                             url: '/api/events/check-location-availability',
                             type: 'GET',
+                            dataType: 'json',
+                            headers: {
+                                'Accept': 'application/json'
+                            },
                             data: {
                                 locationId: locationId,
                                 eventDateTime: eventDate,
                                 excludeEventId: eventId
                             },
-                            success: function(available) {
+                            success: function(response) {
                                 $('#location-availability').remove();
-                                if (available) {
+                                if (response.available) {
                                     $('#locationId').after('<div id="location-availability" class="mt-2 text-success"><i class="bi bi-check-circle"></i> This location is available at the selected time</div>');
                                 } else {
                                     $('#locationId').after('<div id="location-availability" class="mt-2 text-danger"><i class="bi bi-exclamation-triangle"></i> This location is already booked at the selected time</div>');
@@ -179,6 +183,36 @@
             
             // Check availability on page load (for existing date/location)
             checkLocationAvailability();
+            
+            // Validate registration deadline
+            function validateRegistrationDeadline() {
+                const eventDate = $('#eventDate').val();
+                const regDeadline = $('#registrationDeadline').val();
+                
+                // Clear previous validation message
+                $('#deadline-validation').remove();
+                
+                // Only validate if both dates are set
+                if (eventDate && regDeadline) {
+                    const eventDateTime = new Date(eventDate);
+                    const regDateTime = new Date(regDeadline);
+                    
+                    if (regDateTime > eventDateTime) {
+                        $('#registrationDeadline').after('<div id="deadline-validation" class="text-danger mt-1">Registration deadline cannot be after the event date</div>');
+                        return false;
+                    }
+                }
+                return true;
+            }
+            
+            // Validate on change and form submit
+            $('#eventDate, #registrationDeadline').change(validateRegistrationDeadline);
+            
+            $('form').submit(function(e) {
+                if (!validateRegistrationDeadline()) {
+                    e.preventDefault();
+                }
+            });
         });
     </script>
 </body>

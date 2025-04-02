@@ -67,6 +67,14 @@ public class EventController {
             return "redirect:/users/login";
         }
 
+        // Check if registration deadline is after event date
+        if (eventForm.getRegistrationDeadline() != null && 
+            eventForm.getEventDate() != null && 
+            eventForm.getRegistrationDeadline().isAfter(eventForm.getEventDate())) {
+            bindingResult.rejectValue("registrationDeadline", "error.registrationDeadline", 
+                                     "Registration deadline cannot be after the event date");
+        }
+
         if (bindingResult.hasErrors()) {
             model.addAttribute("locations", locationService.getAllLocations());
             return "event-create";
@@ -216,6 +224,14 @@ public class EventController {
                              @Valid @ModelAttribute("eventForm") EventCreateDTO eventForm,
                              BindingResult bindingResult,
                              Model model) {
+        // Check if registration deadline is after event date
+        if (eventForm.getRegistrationDeadline() != null && 
+            eventForm.getEventDate() != null && 
+            eventForm.getRegistrationDeadline().isAfter(eventForm.getEventDate())) {
+            bindingResult.rejectValue("registrationDeadline", "error.registrationDeadline", 
+                                     "Registration deadline cannot be after the event date");
+        }
+        
         if (bindingResult.hasErrors()) {
             model.addAttribute("eventId", id);
             model.addAttribute("locations", locationService.getAllLocations());
