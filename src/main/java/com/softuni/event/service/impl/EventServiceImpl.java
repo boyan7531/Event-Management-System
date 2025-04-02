@@ -290,6 +290,11 @@ public class EventServiceImpl implements EventService {
             return false;
         }
         
+        // Check if user is the organizer
+        if (event.getOrganizer().getId().equals(user.getId())) {
+            return false;
+        }
+        
         // Add user to event attendees
         event.getAttendees().add(user);
         

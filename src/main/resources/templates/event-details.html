@@ -140,8 +140,16 @@
                         <div sec:authorize="isAuthenticated()">
                             <!-- For Approved events that haven't passed yet -->
                             <div th:if="${event.status.name() == 'APPROVED' && event.eventDate.isAfter(T(java.time.LocalDateTime).now()) && (event.registrationDeadline == null || event.registrationDeadline.isAfter(T(java.time.LocalDateTime).now()))}">
-                                <!-- User has not joined -->
-                                <div th:unless="${event.joinedByCurrentUser}">
+                                
+                                <!-- Show a message if user is the organizer -->
+                                <div th:if="${#authentication.principal.username == event.organizer.username}">
+                                    <div class="alert alert-info mb-3">
+                                        <i class="bi bi-info-circle-fill me-2"></i> You are the organizer of this event.
+                                    </div>
+                                </div>
+                                
+                                <!-- User has not joined and is not the organizer -->
+                                <div th:unless="${event.joinedByCurrentUser || #authentication.principal.username == event.organizer.username}">
                                     <p>Join this event to show your interest and receive updates!</p>
                                     <form th:action="@{/events/{id}/join(id=${event.id})}" method="post" class="mb-3">
                                         <button type="submit" class="btn btn-primary w-100">
