@@ -40,4 +40,10 @@ public interface EventRepository extends JpaRepository<EventEntity, Long> {
             @Param("eventEnd") LocalDateTime eventEnd,
             @Param("excludeEventId") Long excludeEventId,
             @Param("statuses") List<EventStatus> statuses);
+
+    /**
+     * Find an event by ID with all necessary associations eagerly loaded
+     */
+    @Query("SELECT e FROM EventEntity e LEFT JOIN FETCH e.organizer LEFT JOIN FETCH e.location LEFT JOIN FETCH e.attendees WHERE e.id = :eventId")
+    EventEntity findByIdWithAssociations(@Param("eventId") Long eventId);
 } 
