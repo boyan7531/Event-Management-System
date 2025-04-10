@@ -53,13 +53,12 @@ class EventDetailDTOTest {
         
         int totalAttendees = 2;
         boolean joinedByCurrentUser = false;
-        String weatherForecast = "Sunny, 25°C";
         
         // Act
         EventDetailDTO dto = new EventDetailDTO(
                 id, title, description, eventDate, registrationDeadline, 
                 isPaid, ticketPrice, availableTickets, status, organizer, 
-                location, attendees, totalAttendees, joinedByCurrentUser, weatherForecast
+                location, attendees, totalAttendees, joinedByCurrentUser
         );
         
         // Assert
@@ -87,7 +86,6 @@ class EventDetailDTOTest {
         
         assertEquals(totalAttendees, dto.getTotalAttendees());
         assertEquals(joinedByCurrentUser, dto.isJoinedByCurrentUser());
-        assertEquals(weatherForecast, dto.getWeatherForecast());
     }
 
     @Test
@@ -125,7 +123,6 @@ class EventDetailDTOTest {
         
         int totalAttendees = 2;
         boolean joinedByCurrentUser = false;
-        String weatherForecast = "Sunny, 25°C";
 
         // Act
         EventDetailDTO dto = new EventDetailDTO();
@@ -143,7 +140,6 @@ class EventDetailDTOTest {
         dto.setAttendees(attendees);
         dto.setTotalAttendees(totalAttendees);
         dto.setJoinedByCurrentUser(joinedByCurrentUser);
-        dto.setWeatherForecast(weatherForecast);
 
         // Assert
         assertEquals(id, dto.getId());
@@ -171,6 +167,5 @@ class EventDetailDTOTest {
         
         assertEquals(totalAttendees, dto.getTotalAttendees());
         assertEquals(joinedByCurrentUser, dto.isJoinedByCurrentUser());
-        assertEquals(weatherForecast, dto.getWeatherForecast());
     }
 } 

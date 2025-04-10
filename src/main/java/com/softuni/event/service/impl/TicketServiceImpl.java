@@ -47,6 +47,15 @@ public class TicketServiceImpl implements TicketService {
         UserEntity user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "username", username));
         
+        // Check if the event location has capacity
+        Integer locationCapacity = event.getLocation().getCapacity();
+        if (locationCapacity != null) {
+            Long currentTicketCount = ticketRepository.countTicketsByEventId(eventId);
+            if (currentTicketCount >= locationCapacity) {
+                throw new IllegalStateException("Cannot create ticket: Event has reached location capacity of " + locationCapacity);
+            }
+        }
+        
         TicketEntity ticket = new TicketEntity();
         ticket.setTicketNumber(UUID.randomUUID().toString());
         ticket.setIssueDate(LocalDateTime.now());

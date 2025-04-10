@@ -162,6 +162,27 @@ class TicketServiceImplTest {
     }
 
     @Test
+    void createTicket_ShouldThrowException_WhenLocationCapacityReached() {
+        // Arrange
+        testEvent.getLocation().setCapacity(10); // Set capacity to 10
+        
+        when(eventRepository.findById(1L)).thenReturn(Optional.of(testEvent));
+        when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(testUser));
+        when(ticketRepository.countTicketsByEventId(1L)).thenReturn(10L); // Current tickets equal to capacity
+        
+        // Act & Assert
+        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> {
+            ticketService.createTicket(1L, "testuser");
+        });
+        
+        assertEquals("Cannot create ticket: Event has reached location capacity of 10", exception.getMessage());
+        verify(eventRepository).findById(1L);
+        verify(userRepository).findByUsername("testuser");
+        verify(ticketRepository).countTicketsByEventId(1L);
+        verifyNoMoreInteractions(ticketRepository);
+    }
+
+    @Test
     void getTicketById_ShouldReturnTicket_WhenFound() {
         // Arrange
         when(ticketRepository.findById(1L)).thenReturn(Optional.of(testTicket));

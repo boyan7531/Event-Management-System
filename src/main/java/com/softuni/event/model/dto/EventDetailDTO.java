@@ -30,5 +30,4 @@ public class EventDetailDTO {
     private Set<UserBasicDTO> attendees;
     private int totalAttendees;
     private boolean joinedByCurrentUser;
-    private String weatherForecast;
 } 

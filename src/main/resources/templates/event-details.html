@@ -44,13 +44,6 @@
                             </div>
                         </div>
                         
-                        <!-- Weather Forecast -->
-                        <div th:if="${event.weatherForecast != null}" class="alert alert-info mb-4">
-                            <i class="bi bi-cloud-sun me-2"></i>
-                            <strong>Weather Forecast:</strong>
-                            <span th:text="${event.weatherForecast}">Sunny, 72°F</span>
-                        </div>
-                        
                         <!-- Event Description -->
                         <h3>Description</h3>
                         <p class="mb-4" th:text="${event.description}" style="white-space: pre-line;">Event description goes here.</p>

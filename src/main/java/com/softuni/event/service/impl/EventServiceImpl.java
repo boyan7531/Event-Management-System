@@ -15,7 +15,6 @@ import com.softuni.event.repository.LocationRepository;
 import com.softuni.event.repository.UserRepository;
 import com.softuni.event.service.EventService;
 import com.softuni.event.service.NotificationService;
-import com.softuni.event.service.WeatherService;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,20 +36,17 @@ public class EventServiceImpl implements EventService {
     private final LocationRepository locationRepository;
     private final ModelMapper modelMapper;
     private final NotificationService notificationService;
-    private final WeatherService weatherService;
 
     public EventServiceImpl(EventRepository eventRepository, 
                            UserRepository userRepository, 
                            LocationRepository locationRepository, 
                            ModelMapper modelMapper, 
-                           NotificationService notificationService, 
-                           WeatherService weatherService) {
+                           NotificationService notificationService) {
         this.eventRepository = eventRepository;
         this.userRepository = userRepository;
         this.locationRepository = locationRepository;
         this.modelMapper = modelMapper;
         this.notificationService = notificationService;
-        this.weatherService = weatherService;
     }
 
     @Override
@@ -152,6 +148,12 @@ public class EventServiceImpl implements EventService {
             throw new IllegalStateException("Registration deadline cannot be after the event date.");
         }
         
+        // Validate that available tickets doesn't exceed location capacity
+        if (eventCreateDTO.getAvailableTickets() != null && location.getCapacity() != null && 
+            eventCreateDTO.getAvailableTickets() > location.getCapacity()) {
+            throw new IllegalStateException("Available tickets cannot exceed the location capacity of " + location.getCapacity() + ".");
+        }
+        
         EventEntity eventEntity = new EventEntity();
         eventEntity.setTitle(eventCreateDTO.getTitle());
         eventEntity.setDescription(eventCreateDTO.getDescription());
@@ -198,6 +200,12 @@ public class EventServiceImpl implements EventService {
         if (eventCreateDTO.getRegistrationDeadline() != null && 
             eventCreateDTO.getRegistrationDeadline().isAfter(eventCreateDTO.getEventDate())) {
             throw new IllegalStateException("Registration deadline cannot be after the event date.");
+        }
+        
+        // Validate that available tickets doesn't exceed location capacity
+        if (eventCreateDTO.getAvailableTickets() != null && location.getCapacity() != null && 
+            eventCreateDTO.getAvailableTickets() > location.getCapacity()) {
+            throw new IllegalStateException("Available tickets cannot exceed the location capacity of " + location.getCapacity() + ".");
         }
         
         event.setTitle(eventCreateDTO.getTitle());
@@ -414,15 +422,6 @@ public class EventServiceImpl implements EventService {
                 .collect(Collectors.toSet());
         dto.setAttendees(attendees);
         dto.setTotalAttendees(attendees.size());
-        
-        // Get weather forecast if event is upcoming
-        if (event.getEventDate().isAfter(LocalDateTime.now()) && 
-            event.getLocation().getCity() != null) {
-            String forecast = weatherService.getWeatherForecast(
-                    event.getLocation().getCity(), 
-                    event.getEventDate());
-            dto.setWeatherForecast(forecast);
-        }
         
         return dto;
     }

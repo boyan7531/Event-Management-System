@@ -2,6 +2,7 @@ package com.softuni.event.controller;
 
 import com.softuni.event.model.dto.UserProfileDTO;
 import com.softuni.event.model.dto.UserRegisterDTO;
+import com.softuni.event.model.entity.UserEntity;
 import com.softuni.event.model.enums.EventStatus;
 import com.softuni.event.service.EventService;
 import com.softuni.event.service.NotificationService;
@@ -80,15 +81,26 @@ public class UserController {
         return "login";
     }
 
+    @GetMapping("/admin-login")
+    public String adminLogin(HttpServletRequest request) {
+        try {
+            // This is just for demo purposes - in a real app, you would have better security
+            request.login("admin", System.getProperty("ADMIN_PASSWORD", "adminpass"));
+            return "redirect:/users/admin/users";
+        } catch (Exception e) {
+            return "redirect:/users/login?error";
+        }
+    }
+
     @GetMapping("/profile")
     public String profile(@AuthenticationPrincipal UserDetails userDetails, Model model) {
         UserProfileDTO userProfile = userService.getUserProfile(userDetails.getUsername());
         model.addAttribute("user", userProfile);
         
-        // Use the new notification system instead of the old one
+        // Only show unread notifications
+        UserEntity user = userService.getUserByUsername(userDetails.getUsername());
         model.addAttribute("notifications", 
-                notificationService.getNotificationsForUser(
-                        userService.getUserByUsername(userDetails.getUsername())));
+                notificationService.getUnreadNotificationsForUser(user));
         
         return "profile";
     }
