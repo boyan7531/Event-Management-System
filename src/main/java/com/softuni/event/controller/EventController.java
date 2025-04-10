@@ -17,6 +17,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import jakarta.validation.Valid;
 import java.time.Month;
@@ -131,20 +132,28 @@ public class EventController {
     }
 
     @PostMapping("/{id}/approve")
+    @PreAuthorize("hasRole('ADMIN')")
     public String approveEvent(@PathVariable Long id, @RequestParam(required = false) String redirectUrl) {
         EventEntity event = eventService.getEvent(id);
+        
+        // Throw exception immediately if event is null
+        if (event == null) {
+            logger.error("Attempted to approve non-existent event with ID: {}", id);
+            // Throw a more specific exception if available/preferred
+            throw new RuntimeException("Event not found with ID: " + id); 
+        }
+        
         eventService.changeEventStatus(id, EventStatus.APPROVED);
         
-        // Create notification for the event creator
+        // Now safe to call methods on event
         notificationService.createEventStatusNotification(event, NotificationType.EVENT_APPROVED);
         
-        // Generate certificate for the approved event
         String certificateId = certificateClientService.generateEventCertificate(event);
         if (certificateId != null) {
-            // Add success flash message about certificate
             logger.info("Certificate generated for event: {}, certificate ID: {}", event.getTitle(), certificateId);
         } else {
-            logger.warn("Failed to generate certificate for event: {}", event.getTitle());
+            // Log the warning using the event title safely
+            logger.warn("Failed to generate certificate for event: {}", event.getTitle()); 
         }
         
         if (redirectUrl != null && !redirectUrl.isEmpty()) {
@@ -185,20 +194,10 @@ public class EventController {
     }
 
     @PostMapping("/{id}/delete")
+    @PreAuthorize("hasRole('ADMIN') or @eventService.isOrganizer(#id, principal.username)")
     public String deleteEvent(@PathVariable Long id, 
                              @AuthenticationPrincipal UserDetails userDetails,
                              @RequestParam(required = false) String redirectUrl) {
-        EventDetailDTO event = eventService.getEventById(id);
-        
-        // Check if user is admin or the event organizer
-        boolean isAdmin = userDetails.getAuthorities().stream()
-                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
-        
-        // Only allow organizer or admin to delete the event
-        if (!isAdmin && !event.getOrganizer().getUsername().equals(userDetails.getUsername())) {
-            throw new RuntimeException("You are not authorized to delete this event");
-        }
-        
         eventService.permanentlyDeleteEvent(id);
         
         if (redirectUrl != null && !redirectUrl.isEmpty()) {

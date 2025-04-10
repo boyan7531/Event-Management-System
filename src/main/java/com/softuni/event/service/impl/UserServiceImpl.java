@@ -59,12 +59,17 @@ public class UserServiceImpl implements UserService {
         userEntity = userRepository.save(userEntity);
         
         // Find or create USER role
-        UserRoleEntity userRole = userRoleRepository.findByRole(UserRole.USER)
-                .orElseGet(() -> {
-                    UserRoleEntity role = new UserRoleEntity();
-                    role.setRole(UserRole.USER);
-                    return role;
-                });
+        List<UserRoleEntity> userRoles = userRoleRepository.findByRole(UserRole.USER);
+        UserRoleEntity userRole;
+        
+        if (userRoles.isEmpty()) {
+            // Create new USER role if none exists
+            userRole = new UserRoleEntity();
+            userRole.setRole(UserRole.USER);
+        } else {
+            // Use the first USER role found
+            userRole = userRoles.get(0);
+        }
         
         // Set up bidirectional relationship
         userRole.setUser(userEntity);

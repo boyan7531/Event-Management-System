@@ -9,20 +9,22 @@ import org.springframework.security.web.context.DelegatingSecurityContextReposit
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.context.RequestAttributeSecurityContextRepository;
 import org.springframework.security.web.context.SecurityContextRepository;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .authorizeHttpRequests(authorize -> authorize
-                .requestMatchers("/", "/about", "/events", "/css/**", "/js/**", "/images/**").permitAll()
+                .requestMatchers("/", "/about", "/events", "/events/details/**", "/faq", "/terms", "/events/calendar", "/error-page").permitAll()
+                .requestMatchers("/css/**", "/js/**", "/images/**").permitAll()
                 .requestMatchers("/users/register", "/users/login").permitAll()
-                .requestMatchers("/events/details/**").permitAll()
-                .requestMatchers("/faq", "/terms", "/events/calendar").permitAll()
-                .requestMatchers("/error-page").permitAll()
+                .requestMatchers(org.springframework.http.HttpMethod.GET, "/users/register", "/users/login").permitAll()
+                .requestMatchers(org.springframework.http.HttpMethod.POST, "/users/register", "/users/login").permitAll()
                 .requestMatchers("/api/**").permitAll()
                 .requestMatchers("/admin", "/users/admin/**").hasRole("ADMIN")
                 .requestMatchers("/locations/create", "/locations/edit/**", "/locations/delete/**").hasRole("ADMIN")
@@ -38,6 +40,8 @@ public class SecurityConfig {
             .logout(logout -> logout
                 .logoutUrl("/logout")
                 .logoutSuccessUrl("/")
+                .invalidateHttpSession(true)
+                .deleteCookies("JSESSIONID")
                 .permitAll()
             )
             .exceptionHandling(exceptions -> exceptions

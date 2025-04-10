@@ -2,12 +2,12 @@
 <html xmlns:th="http://www.thymeleaf.org" 
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
-<head th:replace="fragments/layout :: head('Create Event')">
+<head th:replace="~{fragments/layout :: head('Create Event')}">
     <title>Create Event - Event Management System</title>
 </head>
 
 <body>
-    <nav th:replace="fragments/layout :: navbar"></nav>
+    <nav th:replace="~{fragments/layout :: navbar}"></nav>
 
     <div class="container my-5">
         <div class="row">
@@ -101,9 +101,9 @@
         </div>
     </div>
 
-    <footer th:replace="fragments/layout :: footer"></footer>
+    <footer th:replace="~{fragments/layout :: footer}"></footer>
     
-    <th:block th:replace="fragments/layout :: scripts"></th:block>
+    <th:block th:replace="~{fragments/layout :: scripts}"></th:block>
     
     <script>
         // Show/hide ticket price based on isPaid checkbox

@@ -2,12 +2,12 @@
 <html xmlns:th="http://www.thymeleaf.org" 
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
-<head th:replace="fragments/layout :: head('My Events')">
+<head th:replace="~{fragments/layout :: head('My Events')}">
     <title>My Events - Event Management System</title>
 </head>
 
 <body>
-    <nav th:replace="fragments/layout :: navbar"></nav>
+    <nav th:replace="~{fragments/layout :: navbar}"></nav>
 
     <div class="container my-5">
         <h1 class="mb-4">My Events</h1>
@@ -177,8 +177,8 @@
         </div>
     </div>
 
-    <footer th:replace="fragments/layout :: footer"></footer>
+    <footer th:replace="~{fragments/layout :: footer}"></footer>
     
-    <th:block th:replace="fragments/layout :: scripts"></th:block>
+    <th:block th:replace="~{fragments/layout :: scripts}"></th:block>
 </body>
 </html> 

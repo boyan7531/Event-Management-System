@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.servlet.NoHandlerFoundException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
+import org.springframework.security.access.AccessDeniedException;
 
 import java.util.Date;
 
@@ -27,6 +29,19 @@ public class GlobalExceptionHandler {
         model.addAttribute("status", 404);
         model.addAttribute("error", "Page Not Found");
         model.addAttribute("message", ex.getMessage());
+        model.addAttribute("path", request.getRequestURI());
+        model.addAttribute("timestamp", new Date());
+        return "error/404";
+    }
+    
+    @ExceptionHandler(NoResourceFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public String handleNoResourceFound(NoResourceFoundException ex, Model model, HttpServletRequest request, HttpServletResponse response) {
+        logger.error("Static resource not found: {}", request.getRequestURI());
+        response.setContentType(MediaType.TEXT_HTML_VALUE);
+        model.addAttribute("status", 404);
+        model.addAttribute("error", "Resource Not Found");
+        model.addAttribute("message", "The requested resource was not found: " + ex.getResourcePath());
         model.addAttribute("path", request.getRequestURI());
         model.addAttribute("timestamp", new Date());
         return "error/404";
@@ -53,6 +68,19 @@ public class GlobalExceptionHandler {
         model.addAttribute("status", 403);
         model.addAttribute("error", "Access Denied");
         model.addAttribute("message", ex.getMessage());
+        model.addAttribute("path", request.getRequestURI());
+        model.addAttribute("timestamp", new Date());
+        return "error/403";
+    }
+    
+    @ExceptionHandler(AccessDeniedException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public String handleAccessDenied(AccessDeniedException ex, Model model, HttpServletRequest request, HttpServletResponse response) {
+        logger.warn("Access Denied: {} for user {} accessing {}", ex.getMessage(), request.getUserPrincipal() != null ? request.getUserPrincipal().getName() : "anonymous", request.getRequestURI());
+        response.setContentType(MediaType.TEXT_HTML_VALUE);
+        model.addAttribute("status", 403);
+        model.addAttribute("error", "Forbidden");
+        model.addAttribute("message", "You do not have permission to access this resource.");
         model.addAttribute("path", request.getRequestURI());
         model.addAttribute("timestamp", new Date());
         return "error/403";

@@ -2,12 +2,12 @@
 <html xmlns:th="http://www.thymeleaf.org" 
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
-<head th:replace="fragments/layout :: head(${event.title})">
+<head th:replace="~{fragments/layout :: head(${event.title})}">
     <title>Event Details - Event Management System</title>
 </head>
 
 <body>
-    <nav th:replace="fragments/layout :: navbar"></nav>
+    <nav th:replace="~{fragments/layout :: navbar}"></nav>
 
     <div class="container my-5">
         <!-- Event Status Banner -->
@@ -68,7 +68,7 @@
                                         <span class="badge bg-danger" th:if="${event.status.name() == 'CANCELED'}">Canceled</span>
                                         
                                         <!-- Certificate Download Button (for approved events) -->
-                                        <a th:if="${event.status.name() == 'APPROVED' && event.organizer.username == #authentication.principal.username}" 
+                                        <a th:if="${event.status.name() == 'APPROVED' && event.organizer.username == #authentication.name}" 
                                            th:href="@{/events/{id}/certificate(id=${event.id})}" 
                                            class="btn btn-sm btn-primary ms-2"
                                            target="_blank">
@@ -142,14 +142,14 @@
                             <div th:if="${event.status.name() == 'APPROVED' && event.eventDate.isAfter(T(java.time.LocalDateTime).now()) && (event.registrationDeadline == null || event.registrationDeadline.isAfter(T(java.time.LocalDateTime).now()))}">
                                 
                                 <!-- Show a message if user is the organizer -->
-                                <div th:if="${#authentication.principal.username == event.organizer.username}">
+                                <div th:if="${#authentication.name == event.organizer.username}">
                                     <div class="alert alert-info mb-3">
                                         <i class="bi bi-info-circle-fill me-2"></i> You are the organizer of this event.
                                     </div>
                                 </div>
                                 
                                 <!-- User has not joined and is not the organizer -->
-                                <div th:unless="${event.joinedByCurrentUser || #authentication.principal.username == event.organizer.username}">
+                                <div th:unless="${event.joinedByCurrentUser || #authentication.name == event.organizer.username}">
                                     <p>Join this event to show your interest and receive updates!</p>
                                     <form th:action="@{/events/{id}/join(id=${event.id})}" method="post" class="mb-3">
                                         <button type="submit" class="btn btn-primary w-100">
@@ -306,8 +306,8 @@
         </div>
     </div>
 
-    <footer th:replace="fragments/layout :: footer"></footer>
+    <footer th:replace="~{fragments/layout :: footer}"></footer>
     
-    <th:block th:replace="fragments/layout :: scripts"></th:block>
+    <th:block th:replace="~{fragments/layout :: scripts}"></th:block>
 </body>
 </html> 
